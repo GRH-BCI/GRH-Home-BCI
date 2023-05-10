@@ -364,19 +364,26 @@ class gui(tk.Tk):
         tab_EC.grid_rowconfigure(9, weight=1)
 
         # user info
-        # GRHbci
+        #GRHbci
         # user = {
         #     "license": "",
         #     "client_id": "xAciQLFGunJqagvVY0rrbHHaNyWj28x0IRbZYNit",
         #     "client_secret": "GRNKsYVsb2qgcBZtsO2JTVV1NeuzNhPyZJWmw3KsecbLiVwK2ffyphzr9mUTL65WcMLzqdy5KBGiFekybb26Qx3OPm9U2o13K2lTSI49feO6H24IwDifkGDS2iHRqujC",
         #     "debit": 100
         # }
+        #user0
         user = {
             "license": "",
-            "client_id": "zIAnMwcxpC8A47PdjTzOPKY4MyIkWwEiBrtInXvT",
-            "client_secret": "69BMfbZtH9A7Mw0IV87p9yhXmJsNGF2XWatnUWwftecnws4hxJ9e3X6sN7i3qanwZyfngPm2sCQMreaSEAVXwHbOmx1gTgbfkxKcStfBtUZnal7FqeXoUF2FXf9bQLpo",
+            "client_id": "xGLKsWuCpPVqQCd9bKMBD1C2vE2GXg29iGOdR14s",
+            "client_secret": "QLK3TEGlfO2BDYmOw8HpUVAEzuZDBbw3LAoCDFURMbDl7udwMkGRMywG9COaUzPnSNopKw0ZYbvC22ZukO1h4FpOufnu3m5p7Prg97pKY2kjj9fsgZdRboyZdOG3XvwX",
             "debit": 100
         }
+        # user1 = {
+        #     "license": "",
+        #     "client_id": "zIAnMwcxpC8A47PdjTzOPKY4MyIkWwEiBrtInXvT",
+        #     "client_secret": "69BMfbZtH9A7Mw0IV87p9yhXmJsNGF2XWatnUWwftecnws4hxJ9e3X6sN7i3qanwZyfngPm2sCQMreaSEAVXwHbOmx1gTgbfkxKcStfBtUZnal7FqeXoUF2FXf9bQLpo",
+        #     "debit": 100
+        # }
 
         user2 = {
             "license": "",
@@ -430,13 +437,6 @@ class gui(tk.Tk):
 
             return res
 
-        # # KAdams
-        # user = {
-        #     "license": "",
-        #     "client_id": "dHuZLhxmpDnzKeB1ISs8MMxlZeBqnAsxU8g3juuV	",
-        #     "client_secret": "secret: e4ix6KF73LOkEnogA5Fm3fpA8rVRPHlhvauvHGVfVQVIcgEhKjaAYsTVvBFwEQrMIRZZhDvEpRi4Z8P7y2CSroCwqW9yih3YhzvWVcy2HOwUQhRZuq8zsRyXp7F4rXQm",
-        #     "debit": 100
-        # }
 
         def temp_thread(profile, threshold, dly, key):
             try:
