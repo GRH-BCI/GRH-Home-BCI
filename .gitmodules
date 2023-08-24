@@ -1,0 +1,3 @@
+[submodule "BCI-Paint"]
+	path = BCI-Paint
+	url = https://github.com/GRH-BCI/BCI-Paint.git
