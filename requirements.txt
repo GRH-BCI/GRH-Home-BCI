@@ -1,8 +1,0 @@
-websocket-client
-tkinter 
-tkinter_custom_button
-websocket
-threading 
-ssl
-json
-pynput
