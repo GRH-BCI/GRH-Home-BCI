@@ -7,5 +7,5 @@ BCI-Gaiming-Platform and BCI-Paint are two other repositories  that are integrat
 
 ## Getting Started
 
-# Obtain your unique Client ID and Secret 
+### Obtain your unique Client ID and Secret 
 to use this app, you need to obtain a unique client id and secret from your Emotiv Cortex account. update the user.json file located in the main repository folder. 
