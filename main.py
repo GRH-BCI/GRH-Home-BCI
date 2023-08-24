@@ -364,66 +364,11 @@ class gui(tk.Tk):
         tab_EC.grid_rowconfigure(9, weight=1)
 
         # user info
-        #GRHbci
-        # user = {
-        #     "license": "",
-        #     "client_id": "xAciQLFGunJqagvVY0rrbHHaNyWj28x0IRbZYNit",
-        #     "client_secret": "GRNKsYVsb2qgcBZtsO2JTVV1NeuzNhPyZJWmw3KsecbLiVwK2ffyphzr9mUTL65WcMLzqdy5KBGiFekybb26Qx3OPm9U2o13K2lTSI49feO6H24IwDifkGDS2iHRqujC",
-        #     "debit": 100
-        # }
-        #user0
+
         user = {
             "license": "",
-            "client_id": "xGLKsWuCpPVqQCd9bKMBD1C2vE2GXg29iGOdR14s",
-            "client_secret": "QLK3TEGlfO2BDYmOw8HpUVAEzuZDBbw3LAoCDFURMbDl7udwMkGRMywG9COaUzPnSNopKw0ZYbvC22ZukO1h4FpOufnu3m5p7Prg97pKY2kjj9fsgZdRboyZdOG3XvwX",
-            "debit": 100
-        }
-        # user1 = {
-        #     "license": "",
-        #     "client_id": "zIAnMwcxpC8A47PdjTzOPKY4MyIkWwEiBrtInXvT",
-        #     "client_secret": "69BMfbZtH9A7Mw0IV87p9yhXmJsNGF2XWatnUWwftecnws4hxJ9e3X6sN7i3qanwZyfngPm2sCQMreaSEAVXwHbOmx1gTgbfkxKcStfBtUZnal7FqeXoUF2FXf9bQLpo",
-        #     "debit": 100
-        # }
-
-        user2 = {
-            "license": "",
-            "client_id": "JLuMZwsnMkvrEo5eGR7wwazyXRfjdBBg1KnGC5id",
-            "client_secret": "f2tHNJAVA5O2eza6GkPX5DeZni8J7TW2tI3IuO6YFISdxGmGBtLLm2SvpMTz53TGLvPiZJMw45Mnljnjt1UCSc7r7FXvjcsUOGOB6DHJbg6GU06NtbLCqRiRIDQiDyFz",
-            "debit": 100
-        }
-
-        user3 = {
-            "license": "",
-            "client_id": "UDF74j9A3YE8sp13A3BPb9SuPH8uBo5kOX9rKlcZ",
-            "client_secret": "bjqJC9mGc1JLSkIdfBoVtySzo007b7B7gi4xwG8B4Q71oMSdM1dYgHuvwcemWs6y5rHuZCLVjjhkxTdRl2Am368R63VaYJKpcgOHbSrVT9vQyYESkux4a5qeCvIMOWWN",
-            "debit": 100
-        }
-
-        user4 = {
-            "license": "",
-            "client_id": "PFD8kGY0xgFFXgnH1Yg7Dm77OqueRP39apsU0RDR",
-            "client_secret": "grSnDWYe18x3deJ7yntynqGnc1rvJbELd23L06g8XzEQpJ8tt2SnIvWsSRhMAO6boEC1phdK4SaVvF2Y49cjYHbOax5QlC9S1qZLf1RACs6tLQNTURNDt1laQtn1rxNe",
-            "debit": 100
-        }
-
-        user5 = {
-            "license": "",
-            "client_id": "cNHWGqSgGL8XkwADIOSMOcYLiAJnN0yglA1ABPyP",
-            "client_secret": "f18GFszI2pV5DZb1v2SPadul9pB2k8K7hz03zz4mJoyea2oqT6ej0SQWKPS95fkAAIM8B03A4ppZAK9j2dPIeDnyLteUpn2C1ZfiNWvGfFPpFj9DQ34FcXicIeLXXqYJ",
-            "debit": 100
-        }
-
-        user6 = {
-            "license": "",
-            "client_id": "Rv2DOlaqT0vNmAEvT1Ht0GyTofMmHj2ojMtuH0i0",
-            "client_secret": "hO2GKGh7gVufqKcDeShLZSUbQ7eR2hqVOyt2YtUg88SQc5Rb9yQYdoeU5LjkhekI8ga7Jd7rBCpjB48zfievQlbpti72C3G046HUcnHQQLPyRddlWrGuDdvbf3FfYDgF",
-            "debit": 100
-        }
-
-        user7 = {
-            "license": "",
-            "client_id": "E41W7lO3847qB7qFN6t5Ygec21b2uU7wQTG8laTD",
-            "client_secret": "tXyJqAxWzshYwOVhUyTOnpfyS9O4ULvzoN8cmYOwU8mBlQ6Wbz8eiE0DksVBaJAhOEMwSPrE4p0b3K25HoD4680HJIRNWBAnuvdFyP8TrfRwGOXJgxhlwvg3ZGdWr6Ic",
+            "client_id": "your client id",
+            "client_secret": "your client secret",
             "debit": 100
         }
 
