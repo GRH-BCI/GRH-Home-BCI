@@ -1,3 +1,6 @@
 [submodule "BCI-Paint"]
 	path = BCI-Paint
 	url = https://github.com/GRH-BCI/BCI-Paint.git
+[submodule "BCI_Gaming_Platform"]
+	path = BCI_Gaming_Platform
+	url = https://github.com/GRH-BCI/BCI_Gaming_Platform.git
