@@ -23,11 +23,11 @@ try:
 except:
     ArduinoSerial = False
 
+global flag, activations, targets
 
 flag = 'go'
 activations = []
 targets = []
-global flag, activations, targets
 
 class ThreadClass(QtCore.QObject):
 
@@ -558,6 +558,7 @@ target_recording_thread.start()
 
 
 try:
+
     sys.exit(app.exec_())
 except:
     print("Exiting")
