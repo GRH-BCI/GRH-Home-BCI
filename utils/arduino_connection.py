@@ -1,7 +1,9 @@
 import json
 import serial.tools.list_ports
 
-
+'''
+    check to see if arduino is connected to the specified port. 
+'''
 def check_arduino_connection():
     with open("config.json", "r") as config_file:
         config = json.load(config_file)

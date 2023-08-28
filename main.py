@@ -29,10 +29,19 @@ flag = 'go'
 activations = []
 targets = []
 
-class ThreadClass(QtCore.QObject):
+'''
+    pyqt5 thread class that is used to generate a separate thread object for updating the UI Emotiv connection labels,
+    Emotiv power progress bar, arduino connection labeel, and Emotov power labels in all tabs. we use pyqt5
+    multi-threading capabilities. 
+    "Run" function receives data from the Emotiv headset and generates an output list of parameters that is emitted to 
+    be used by WelcomeScreen.update_ui to update the ui. 
+'''
 
+
+class ThreadClass(QtCore.QObject):
     finished = QtCore.pyqtSignal()
     progress = QtCore.pyqtSignal(list)
+
     def run(self):
         while True:
             global ArduinoSerial
@@ -49,20 +58,34 @@ class ThreadClass(QtCore.QObject):
             with open("config.json", "r") as config_file:
                 config = json.load(config_file)
 
-            if config["key_push"] != "-": key_push = "Push: " + config["key_push"]
-            else:key_push = ""
-            if config["key_pull"] != "-": key_pull = "Pull: " + config["key_pull"]
-            else: key_pull = ""
-            if config["key_lift"] != "-":key_lift = "Lift: " + config["key_lift"]
-            else:key_lift = ""
-            if config["key_left"] != "-": key_left = "Left: " + config["key_left"]
-            else: key_left = ""
-            if config["key_right"] != "-":key_right = "Right: " + config["key_right"]
-            else:key_right = ""
-            if config["dev1_act"] != "-":dev1_act = "Device 1: " + config["dev1_act"]
-            else:dev1_act = ""
-            if config["dev2_act"] != "-":dev2_act = "Device 2: " + config["dev2_act"]
-            else:dev2_act = ""
+            if config["key_push"] != "-":
+                key_push = "Push: " + config["key_push"]
+            else:
+                key_push = ""
+            if config["key_pull"] != "-":
+                key_pull = "Pull: " + config["key_pull"]
+            else:
+                key_pull = ""
+            if config["key_lift"] != "-":
+                key_lift = "Lift: " + config["key_lift"]
+            else:
+                key_lift = ""
+            if config["key_left"] != "-":
+                key_left = "Left: " + config["key_left"]
+            else:
+                key_left = ""
+            if config["key_right"] != "-":
+                key_right = "Right: " + config["key_right"]
+            else:
+                key_right = ""
+            if config["dev1_act"] != "-":
+                dev1_act = "Device 1: " + config["dev1_act"]
+            else:
+                dev1_act = ""
+            if config["dev2_act"] != "-":
+                dev2_act = "Device 2: " + config["dev2_act"]
+            else:
+                dev2_act = ""
 
             ard_connection = check_arduino_connection()
             try:
@@ -72,20 +95,34 @@ class ThreadClass(QtCore.QObject):
                 c.do_prepare_steps()
                 c.sub_request(['sys'])
                 while True:
-                    if config["key_push"] != "-":key_push = "Push: " + config["key_push"]
-                    else:key_push = ""
-                    if config["key_pull"] != "-":key_pull = "Pull: " + config["key_pull"]
-                    else:key_pull = ""
-                    if config["key_lift"] != "-":key_lift = "Lift: " + config["key_lift"]
-                    else:key_lift = ""
-                    if config["key_left"] != "-":key_left = "Left: " + config["key_left"]
-                    else:key_left = ""
-                    if config["key_right"] != "-":key_right = "Right: " + config["key_right"]
-                    else:key_right = ""
-                    if config["dev1_act"] != "-":dev1_act = "Device 1: " + config["dev1_act"]
-                    else:dev1_act = ""
-                    if config["dev2_act"] != "-":dev2_act = "Device 2: " + config["dev2_act"]
-                    else: dev2_act = ""
+                    if config["key_push"] != "-":
+                        key_push = "Push: " + config["key_push"]
+                    else:
+                        key_push = ""
+                    if config["key_pull"] != "-":
+                        key_pull = "Pull: " + config["key_pull"]
+                    else:
+                        key_pull = ""
+                    if config["key_lift"] != "-":
+                        key_lift = "Lift: " + config["key_lift"]
+                    else:
+                        key_lift = ""
+                    if config["key_left"] != "-":
+                        key_left = "Left: " + config["key_left"]
+                    else:
+                        key_left = ""
+                    if config["key_right"] != "-":
+                        key_right = "Right: " + config["key_right"]
+                    else:
+                        key_right = ""
+                    if config["dev1_act"] != "-":
+                        dev1_act = "Device 1: " + config["dev1_act"]
+                    else:
+                        dev1_act = ""
+                    if config["dev2_act"] != "-":
+                        dev2_act = "Device 2: " + config["dev2_act"]
+                    else:
+                        dev2_act = ""
 
                     ard_connection = check_arduino_connection()
                     stream = ['com']
@@ -117,7 +154,7 @@ class ThreadClass(QtCore.QObject):
                         devs = {'dev1_act': dev1_act, 'dev2_act': dev2_act}
                         update_vals = [progress_val, progress_label, keys, devs, headset, arduino_con]
                         self.progress.emit(update_vals)
-                        # time.sleep(.01)
+
             except:
                 print('except')
                 progress_label = "--"
@@ -126,11 +163,33 @@ class ThreadClass(QtCore.QObject):
                 arduino_con = ard_connection
 
                 keys = {"key_push": key_push, "key_pull": key_pull, "key_lift": key_lift, "key_left": key_left,
-                                "key_right": key_right}
+                        "key_right": key_right}
                 devs = {'dev1_act': dev1_act, 'dev2_act': dev2_act}
                 update_vals = [progress_val, progress_label, keys, devs, headset, arduino_con]
                 self.progress.emit(update_vals)
-                # time.sleep(.01)
+
+
+'''
+    main UI class that loads the welcomescreen.ui file. welcomescreen.ui is generated using pyqt designer app and 
+    can be editted in designer if needed. in order to lead the requried resources, there is a resources.qrc file 
+    included the main path folder. resources.qrc is generated from resources.qrc. if you need to add new icons in desiner 
+    and change the resources used for bulding this project you need to create a new resources_rc.py file 
+    you can do so by typing the following in the powershell in the main project path 
+    "pyrcc5 resource.qrc -o resources_rc.py" 
+    
+    this class also includes the following functions: 
+    update_borders: used for updating the ui after pressing buttons on the left widget( keyboard, FES, smart-home, others,
+    settings, and help) 
+    update_ui_parameters: updates ui based on the changes in settings window
+    update_config_file: updates config.json based on the changes in settings window and saves the settings for future 
+    set_headset_status: updates headset status labels after pressing "check headset connectivity" button on each page 
+    set_arduino_status: checks for arduino connectivity and updates Hub box connectivity label in smart-home page 
+    update_ui: takes in the emitted values from ThreadClass object as input and updates ui feature based on values 
+    coming from the headset.    
+    runner: starts the worker and updater thread for updating the ui parameters 
+    
+    
+    '''
 
 
 class WelcomeScreen(QDialog):
@@ -330,11 +389,8 @@ class WelcomeScreen(QDialog):
         else:
             dev2_act = ""
         self.keyStatLabel.setText(f"Current key mapping:     {key_push}      {key_pull}      "
-                                     f"{key_lift}       {key_left}      {key_right}")
+                                  f"{key_lift}       {key_left}      {key_right}")
         self.smartStatLabel.setText(f"Device activations:    {dev1_act}      {dev2_act}")
-
-
-
 
     def set_headset_status(self):
         stat = check_headset_connection()
@@ -366,7 +422,7 @@ class WelcomeScreen(QDialog):
         self.fesLabel.setText(progress_label)
         self.fesProgressBar.setValue(progress_val)
         self.keyStatLabel.setText(f"Current key mapping:     {keys['key_push']}      {keys['key_pull']}      "
-                                     f"{keys['key_lift']}       {keys['key_left']}      {keys['key_right']}")
+                                  f"{keys['key_lift']}       {keys['key_left']}      {keys['key_right']}")
         self.smartStatLabel.setText(f"Device activations:    {devs['dev1_act']}      {devs['dev2_act']}")
         if headset:
             self.keyHeadLabel.setText("Emotiv headset is connected!")
@@ -395,7 +451,6 @@ class WelcomeScreen(QDialog):
             self.fesStatLabel.setText("Hub box NOT connected!")
             self.fesStatLabel.setStyleSheet("color:red;")
 
-
     def runner(self):
         self.thread = QThread()
         self.worker = ThreadClass()
@@ -405,26 +460,13 @@ class WelcomeScreen(QDialog):
         self.thread.start()
 
 
-def start_emotiv(output: str):
-    if output == 'keyboard':
-        start_thread("keyboard")
-
-    elif output == 'smart-home':
-        start_thread("smart-home")
-
-    elif output == 'fes':
-        start_thread("fes")
-
-
 #
 
 
 """
  headset_thread: a thread that generates an object from the Emotiv cortex  class and 
  runs the sub_request_GRH function in an infinite while loop. this function constantly 
- reads data generated by the headset and maps it to keyboard key presses. it also emits 
- the data as a global variable called com_data in case it needs to be used by other functions 
- com_data is a dictionary containing action, power, and time_stamp of the headset recording 
+ reads data generated by the headset and maps it to keyboard key presses, FES, or smartplug outputs. 
 """
 
 
@@ -492,6 +534,13 @@ def stop_thread():
     flag = 'stop'
 
 
+'''
+    set_target: is the function that is used in target_recording_thread to record external button presses. these presses 
+    indicate targets generated by the third-party for BCI user to activate the BCI paradigm. these targets and their 
+    following activations are used to generate a report in csv format in the data_sets folder in project path. 
+'''
+
+
 def set_target():
     global targets, ArduinoSerial
     try:
@@ -535,9 +584,7 @@ def set_target():
                     ArduinoSerial = False
 
 
-
-
-# main
+# generating main window object
 app = QApplication(sys.argv)
 welcome = WelcomeScreen()
 widget = QtWidgets.QStackedWidget()
@@ -546,19 +593,11 @@ widget.setWindowIcon(QtGui.QIcon("logo.png"))
 widget.setWindowTitle("GRH Home-BCI")
 widget.show()
 
-''' 
-    headset_ui_updater thread that constantly reads data from headset and updates the progress
-    bars and labels corresponding to headset readings within the UI
-'''
-
-
-
+# starting target recording thread
 target_recording_thread = threading.Thread(target=set_target, args=(), daemon=True)
 target_recording_thread.start()
 
-
 try:
-
     sys.exit(app.exec_())
 except:
     print("Exiting")
