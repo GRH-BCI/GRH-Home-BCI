@@ -10,5 +10,8 @@ BCI-Gaiming-Platform and BCI-Paint are two other repositories  that are integrat
 ### Obtain your unique Client ID and Secret 
 to use this app, you need to obtain a unique client id and secret from your Emotiv Cortex account. update the user.json file located in the main repository folder with your new client information. 
 ### Build BCI_Paint and BCI_gaming executables 
-To run BCI_paint or BCI_gaming apps, the project needs to be built into executable first. run the following in each project's path to create the executable: 
+in order to open BCI-Paint and BCI_gaming apps through the Home-BCI app, you need to build the executables for each of those app. launch_app.py handles  opening external apps. you may need to change the path for opening external executables based on how you build those projects. 
+### Find the arduino COM port and smart-plug's IP Address 
+
+
     
