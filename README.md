@@ -19,5 +19,4 @@ To find the arduino port, after connecting the arduino through usb, either use t
 
 We've only programmed Kasa smart-plugs into this app for now. to find the IP address for your smart-plug please refer to your router's admin page. 
 
-
-    
+### running the main app   
