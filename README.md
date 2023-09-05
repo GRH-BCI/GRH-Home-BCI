@@ -15,7 +15,9 @@ in order to open BCI-Paint and BCI_gaming apps through the Home-BCI app, you nee
 Refer to each repository separately for build instructions. "launch_app.py" is the function that handles opening these two apps externally. 
 
 ### Find the arduino COM port and smart-plug's IP Address 
-To find the arduino port, after connecting the arduino through usb, either use the arduino IDE or run 
+To find the arduino port, after connecting the arduino through usb, either use the arduino IDE or run serial.tools.list_ports.comports() to get a list of connected COM ports. to specify the port you can either adjust the config.json file or change the COM port value in the settings tab of the app and then save settings. 
+
+We've only programmed Kasa smart-plugs into this app for now. to find the IP address for your smart-plug please refer to your router's admin page. 
 
 
     
