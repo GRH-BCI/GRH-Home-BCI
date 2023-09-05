@@ -19,4 +19,12 @@ To find the arduino port, after connecting the arduino through usb, either use t
 
 We've only programmed Kasa smart-plugs into this app for now. to find the IP address for your smart-plug please refer to your router's admin page. 
 
-### running the main app   
+### Building the project 
+1. Download the source code
+2. Unzip the folder
+3. Navigate to the folder in your preferred IDE or in the terminal and run: pyinstaller main.py
+4. A 'dist' folder should be created and the exectuable should be inside the 'main' folder in the 'dist' folder
+5. Move or copy the main.exe to the project folder. you need the following files to be in the same path as main.exe: config.json, time_config.json, welcomescreen.ui, user.json, utils folder, assets folder
+6. Double click on main.exe to run the app!
+you can alternatively run the source code by running main or opening main.py in your IDE if you have all the dependencies installed: python3 main.py 
+
