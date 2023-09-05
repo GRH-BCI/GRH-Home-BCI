@@ -1,4 +1,4 @@
-# Imagination Centre Home-BCI python version 
+# Imagination Centre Home-BCI  
 This Repository contains python source code for building the Home-BCI app. 
 
 ## About
