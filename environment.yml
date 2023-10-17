@@ -1,0 +1,18 @@
+name: Home-BCI
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - PyQt5
+    - pyserial
+    - websocket-client
+    - pynput
+    - datetime
+    - asyncio
+    - numpy
+    - pandas
+    - python-kasa
+
