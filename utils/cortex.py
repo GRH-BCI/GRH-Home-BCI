@@ -353,7 +353,7 @@ class Cortex(Dispatcher):
             else:
                 print(new_data)
 
-    def sub_request_GRH(self, stream, threshold, delay, key, arduino_serial, triggers, min_dly, flag, env, prev_state,device_ip,device_act, device_duration):
+    def sub_request_GRH(self, stream, threshold, delay, key, arduino_serial, triggers, min_dly, flag, env, prev_state,device_ip,device_act, device_duration, prev_wc_btn, btn_action):
         print('subscribe request --------------------------------')
         sub_request_json = {
             "jsonrpc": "2.0",
@@ -403,7 +403,6 @@ class Cortex(Dispatcher):
         new_data = self.ws.recv()
         # Then emit the change with optional positional and keyword arguments
         result_dic = json.loads(new_data)
-
         if result_dic.get('com') != None:
             com_data = {}
             com_data['action'] = result_dic['com'][0]
@@ -413,6 +412,10 @@ class Cortex(Dispatcher):
             self.emit('new_com_data', data=com_data)
             on_command = str(triggers[0])
             off_command = str(triggers[1])
+            btn1_action = str(btn_action[0])
+            btn2_action = str(btn_action[1])
+            btn3_action = str(btn_action[2])
+            btn4_action = str(btn_action[3])
 
             if com_data['action'] == 'push' and 100 * float(com_data['power']) >= int(threshold) and (
                     float(com_data['time']) - temp_time) >= delay and flag != 'stop' and env == "keyboard":
@@ -551,6 +554,38 @@ class Cortex(Dispatcher):
                         float(com_data['time']) - temp_time) >= delay and flag != 'stop' and env == "smart-home":
                 asyncio.run(handle_device(device_ip[1], device_duration))
 
+            elif com_data['action'] == btn1_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn1' and flag != 'stop'and env == "wc":
+                arduino_serial.write(str.encode('0'))
+                arduino_serial.write(str.encode('N'))
+                time.sleep(.1)
+                prev_wc_btn = 'btn1'
+                config["time"] = float(com_data['time'])
+                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+            elif com_data['action'] == btn2_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn2' and flag != 'stop'and env == "wc":
+                arduino_serial.write(str.encode('0'))
+                arduino_serial.write(str.encode('2'))
+                time.sleep(.1)
+                prev_wc_btn = 'btn2'
+                config["time"] = float(com_data['time'])
+                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+            elif com_data['action'] == btn3_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn3' and flag != 'stop'and env == "wc":
+                arduino_serial.write(str.encode('0'))
+                arduino_serial.write(str.encode('3'))
+                time.sleep(.1)
+                prev_wc_btn = 'btn3'
+                config["time"] = float(com_data['time'])
+                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+            elif com_data['action'] == btn4_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn4' and flag != 'stop'and env == "wc":
+                arduino_serial.write(str.encode('0'))
+                arduino_serial.write(str.encode('4'))
+                time.sleep(.1)
+                prev_wc_btn = 'btn4'
+                config["time"] = float(com_data['time'])
+                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+            elif flag != 'stop'and env == "wc" and com_data['action'] == 'neutral':
+                arduino_serial.write(str.encode('0'))
+                arduino_serial.write(str.encode('F'))
+                prev_wc_btn = 'off'
             else:
                 print('Waiting for new command')
 
@@ -596,7 +631,7 @@ class Cortex(Dispatcher):
             self.emit('new_pow_data', data=pow_data)
         else:
             print(new_data)
-        return prev_state, activation
+        return prev_state, activation, prev_wc_btn
 
     def extract_data_labels(self, stream_name, stream_cols):
         data = {}

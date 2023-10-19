@@ -202,8 +202,10 @@ class WelcomeScreen(QDialog):
         self.smarthome.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(1), self.update_borders('smart')])
         self.fes.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(2), self.update_borders('fes')])
         self.other.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(3), self.update_borders('other')])
-        self.settings.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(4), self.update_borders('settings')])
-        self.hlp.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(5), self.update_borders('help')])
+        self.settings.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(5), self.update_borders('settings')])
+        self.hlp.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(6), self.update_borders('help')])
+        self.wheelchair.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(4), self.update_borders('wheelchair')])
+
 
         # Button presses in each page
         # keyboard page
@@ -228,6 +230,21 @@ class WelcomeScreen(QDialog):
         self.paintLaunchBtn.clicked.connect(lambda: launch_app("BCI Paint"))
         self.gamingLaunchBtn.clicked.connect(lambda: launch_app("BCI Gaming"))
 
+        # wheelchair page
+        self.WCCheckBtn.clicked.connect(lambda: self.set_headset_status())
+        self.WCStartBtn.clicked.connect(lambda: start_thread("wc"))
+        self.WCPauseBtn.clicked.connect(lambda: stop_thread())
+        self.WCCheckBtn.clicked.connect(lambda: self.set_headset_status())
+
+        self.WCManualOnBtn_1.pressed.connect(lambda: manual_btn_control(ArduinoSerial, 1))
+        self.WCManualOnBtn_1.released.connect(lambda: manual_btn_control(ArduinoSerial, 0))
+        self.WCManualOnBtn_2.pressed.connect(lambda: manual_btn_control(ArduinoSerial, 2))
+        self.WCManualOnBtn_2.released.connect(lambda: manual_btn_control(ArduinoSerial, 0))
+        self.WCManualOnBtn_3.pressed.connect(lambda: manual_btn_control(ArduinoSerial, 3))
+        self.WCManualOnBtn_3.released.connect(lambda: manual_btn_control(ArduinoSerial, 0))
+        self.WCManualOnBtn_4.pressed.connect(lambda: manual_btn_control(ArduinoSerial, 4))
+        self.WCManualOnBtn_4.released.connect(lambda: manual_btn_control(ArduinoSerial, 0))
+
         # settings page
         self.saveSettingsBtn.clicked.connect(lambda: self.update_config_file())
 
@@ -239,6 +256,23 @@ class WelcomeScreen(QDialog):
         self.set_arduino_status()
         self.runner()
 
+    def btnstate(self):
+        if self.WCManualOnBtn_1.isChecked():
+            manual_btn_control(ArduinoSerial, 1)
+        else:
+            manual_btn_control(ArduinoSerial, 0)
+        if self.WCManualOnBtn_2.isChecked():
+            manual_btn_control(ArduinoSerial, 2)
+        else:
+            manual_btn_control(ArduinoSerial, 0)
+        if self.WCManualOnBtn_3.isChecked():
+            manual_btn_control(ArduinoSerial, 3)
+        else:
+            manual_btn_control(ArduinoSerial, 0)
+        if self.WCManualOnBtn_4.isChecked():
+            manual_btn_control(ArduinoSerial, 4)
+        else:
+            manual_btn_control(ArduinoSerial, 0)
     def update_borders(self, tab):
         self.keyboard.setStyleSheet(
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
@@ -252,7 +286,8 @@ class WelcomeScreen(QDialog):
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
         self.hlp.setStyleSheet(
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
-
+        self.wheelchair.setStyleSheet(
+            "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
         if tab == 'keyboard':
             self.keyboard.setStyleSheet(
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
@@ -264,6 +299,9 @@ class WelcomeScreen(QDialog):
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
         elif tab == 'other':
             self.other.setStyleSheet(
+                "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
+        elif tab == 'wheelchair':
+            self.wheelchair.setStyleSheet(
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
         elif tab == 'settings':
             self.settings.setStyleSheet(
@@ -300,6 +338,10 @@ class WelcomeScreen(QDialog):
         fes_acceptable_dly = config["fes_acceptable_dly"]
         fes_min_dly = config["fes_min_dly"]
         smart_on_period = config["smart_on_period"]
+        btn_1 = config["btn_1"]
+        btn_2 = config["btn_2"]
+        btn_3 = config["btn_3"]
+        btn_4 = config["btn_4"]
 
         # load Emotiv user info
         with open("user.json", "r") as user_file:
@@ -333,6 +375,10 @@ class WelcomeScreen(QDialog):
         self.trgtActDlySpin.setValue(int(fes_acceptable_dly))
         self.minDlySpin.setValue(int(fes_min_dly))
         self.smartSpinBox.setValue(int(smart_on_period))
+        self.wcCombo_1.setCurrentIndex(emotiv_cmnds.index(btn_1))
+        self.wcCombo_2.setCurrentIndex(emotiv_cmnds.index(btn_2))
+        self.wcCombo_3.setCurrentIndex(emotiv_cmnds.index(btn_3))
+        self.wcCombo_4.setCurrentIndex(emotiv_cmnds.index(btn_4))
 
     def update_config_file(self):
         '''
@@ -359,7 +405,12 @@ class WelcomeScreen(QDialog):
         config["fes_acceptable_dly"] = self.trgtActDlySpin.value()
         config["fes_min_dly"] = self.minDlySpin.value()
         config["smart_on_period"] = self.smartSpinBox.value()
-        json.dump(config, open("config.json", "w"), indent=4, sort_keys=True)
+        config["btn_1"] = emotiv_cmnds[self.wcCombo_1.currentIndex()]
+        config["btn_2"] = emotiv_cmnds[self.wcCombo_2.currentIndex()]
+        config["btn_3"] = emotiv_cmnds[self.wcCombo_3.currentIndex()]
+        config["btn_4"] = emotiv_cmnds[self.wcCombo_4.currentIndex()]
+
+        json.dump(config, open("config.json", "w"), indent=4, sort_keys=False)
         if config["key_push"] != "-":
             key_push = "Push: " + config["key_push"]
         else:
@@ -398,6 +449,7 @@ class WelcomeScreen(QDialog):
             self.keyHeadLabel.setText("Emotiv headset is connected!")
             self.smartHeadLabel.setText("Emotiv headset is connected!")
             self.fesHeadLabel.setText("Emotiv headset is connected!")
+            self.WCHeadLabel.setText("Emotiv headset is connected!")
         else:
             self.keyHeadLabel.setText("Emotiv headset is NOT connected!")
             self.keyHeadLabel.setStyleSheet("color:red;")
@@ -405,13 +457,18 @@ class WelcomeScreen(QDialog):
             self.smartHeadLabel.setStyleSheet("color:red;")
             self.fesHeadLabel.setText("Emotiv headset is NOT connected!")
             self.fesHeadLabel.setStyleSheet("color:red;")
+            self.WCHeadLabel.setText.setText("Emotiv headset is NOT connected!")
+            self.WCHeadLabel.setStyleSheet("color:red;")
 
     def set_arduino_status(self):
         arduino_Stat = check_arduino_connection
         if arduino_Stat:
             self.fesStatLabel.setText("Hub box is connected!")
+            self.WCStatLabel.setText("Hub box is connected!")
         else:
             self.fesStatLabel.setText("Hub box is NOT connected!")
+            self.WCStatLabel.setText("Hub box is NOT connected!")
+
 
     def update_ui(self, update_vals):
         [progress_val, progress_label, keys, devs, headset, arduino_con] = update_vals
@@ -421,6 +478,8 @@ class WelcomeScreen(QDialog):
         self.smartProgressBar.setValue(progress_val)
         self.fesLabel.setText(progress_label)
         self.fesProgressBar.setValue(progress_val)
+        self.WCProgressBar.setValue(progress_val)
+        self.WCLabel.setText(progress_label)
         self.keyStatLabel.setText(f"Current key mapping:     {keys['key_push']}      {keys['key_pull']}      "
                                   f"{keys['key_lift']}       {keys['key_left']}      {keys['key_right']}")
         self.smartStatLabel.setText(f"Device activations:    {devs['dev1_act']}      {devs['dev2_act']}")
@@ -428,9 +487,11 @@ class WelcomeScreen(QDialog):
             self.keyHeadLabel.setText("Emotiv headset is connected!")
             self.smartHeadLabel.setText("Emotiv headset is connected!")
             self.fesHeadLabel.setText("Emotiv headset is connected!")
+            self.WCHeadLabel.setText("Emotiv headset is connected!")
             self.keyHeadLabel.setStyleSheet("color:white;")
             self.smartHeadLabel.setStyleSheet("color:white;")
             self.fesHeadLabel.setStyleSheet("color:white;")
+            self.WCHeadLabel.setStyleSheet("color:white;")
         else:
             self.keyLabel.setText("--")
             self.keyProgressBar.setValue(0)
@@ -444,12 +505,20 @@ class WelcomeScreen(QDialog):
             self.smartHeadLabel.setStyleSheet("color:red;")
             self.fesHeadLabel.setText("Emotiv headset is NOT connected!")
             self.fesHeadLabel.setStyleSheet("color:red;")
+            self.WCHeadLabel.setText("Emotiv headset is NOT connected!")
+            self.WCHeadLabel.setStyleSheet("color:red;")
+
+
         if arduino_con:
             self.fesStatLabel.setText("Hub box connected!")
             self.fesStatLabel.setStyleSheet("color:white;")
+            self.WCStatLabel.setText("Hub box connected!")
+            self.WCStatLabel.setStyleSheet("color:white;")
         else:
             self.fesStatLabel.setText("Hub box NOT connected!")
             self.fesStatLabel.setStyleSheet("color:red;")
+            self.WCStatLabel.setText("Hub box NOT connected!")
+            self.WCStatLabel.setStyleSheet("color:red;")
 
     def runner(self):
         self.thread = QThread()
@@ -483,7 +552,7 @@ def headset_thread(env, ArduinoSerial):
     device_ip = [config["dev1_ip"], config["dev2_ip"]]
     device_act = [config["dev1_act"], config["dev2_act"]]
     device_duration = config["smart_on_period"]
-
+    btn_action = [config["btn_1"], config["btn_2"], config["btn_3"], config["btn_4"]]
     with open("user.json", "r") as user_file:
         user_info = json.load(user_file)
     user = {
@@ -506,10 +575,10 @@ def headset_thread(env, ArduinoSerial):
             status = 'load'
             c.setup_profile(profile, status)
         prev = 'off'
-
+        prev_wc_btn = 'off'
         while True:
-            prev, last_act = c.sub_request_GRH(stream, threshold, dly, key, ArduinoSerial, triggers, min_dly, flag, env,
-                                               prev, device_ip, device_act, device_duration)
+            prev, last_act, prev_wc_btn = c.sub_request_GRH(stream, threshold, dly, key, ArduinoSerial, triggers, min_dly, flag, env,
+                                               prev, device_ip, device_act, device_duration, prev_wc_btn, btn_action)
             if last_act:
                 activations.append(last_act)
             print(activations)
