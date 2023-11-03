@@ -202,9 +202,11 @@ class WelcomeScreen(QDialog):
         self.smarthome.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(1), self.update_borders('smart')])
         self.fes.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(2), self.update_borders('fes')])
         self.other.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(3), self.update_borders('other')])
-        self.settings.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(5), self.update_borders('settings')])
-        self.hlp.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(6), self.update_borders('help')])
         self.wheelchair.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(4), self.update_borders('wheelchair')])
+        self.toy.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(5), self.update_borders('toy')])
+        self.settings.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(6), self.update_borders('settings')])
+        self.hlp.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(7), self.update_borders('help')])
+
 
 
         # Button presses in each page
@@ -288,6 +290,8 @@ class WelcomeScreen(QDialog):
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
         self.wheelchair.setStyleSheet(
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
+        self.toy.setStyleSheet(
+            "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
         if tab == 'keyboard':
             self.keyboard.setStyleSheet(
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
@@ -302,6 +306,9 @@ class WelcomeScreen(QDialog):
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
         elif tab == 'wheelchair':
             self.wheelchair.setStyleSheet(
+                "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
+        elif tab == 'toy':
+            self.toy.setStyleSheet(
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
         elif tab == 'settings':
             self.settings.setStyleSheet(
@@ -379,6 +386,8 @@ class WelcomeScreen(QDialog):
         self.wcCombo_2.setCurrentIndex(emotiv_cmnds.index(btn_2))
         self.wcCombo_3.setCurrentIndex(emotiv_cmnds.index(btn_3))
         self.wcCombo_4.setCurrentIndex(emotiv_cmnds.index(btn_4))
+
+
 
     def update_config_file(self):
         '''

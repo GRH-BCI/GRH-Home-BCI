@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/play.svg</file>
+    <file>icons/record.svg</file>
+    <file>icons/wheelchair.svg</file>
+    <file>icons/toy.svg</file>
     <file>icons/activity.svg</file>
     <file>icons/archive.svg</file>
     <file>icons/book-open.svg</file>

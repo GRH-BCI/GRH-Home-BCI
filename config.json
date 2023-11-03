@@ -9,11 +9,15 @@
     "fes_min_dly": 2,
     "fes_off": "-",
     "fes_on": "push",
-    "fes_port": "COM11",
+    "fes_port": "COM8",
     "key_left": "left",
     "key_lift": "d",
     "key_pull": "a",
-    "key_push": "a",
+    "key_push": "s",
     "key_right": "-",
-    "smart_on_period": 5
+    "smart_on_period": 5,
+    "btn_1": "push",
+    "btn_2": "-",
+    "btn_3": "-",
+    "btn_4": "-"
 }
