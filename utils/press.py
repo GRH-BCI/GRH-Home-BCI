@@ -1,4 +1,5 @@
 from pynput.keyboard import Key, Controller
+
 import threading
 import time
 kb = Controller()
