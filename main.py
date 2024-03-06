@@ -13,6 +13,8 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # check for arduino connection
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
+
+arduino_connection.find_arduino_port()
 arduino_port = config["fes_port"]
 success_threshold = config["fes_acceptable_dly"]
 try:

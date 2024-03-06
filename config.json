@@ -1,7 +1,7 @@
 {
     "activation_threshold": 60,
     "activation_delay": 0,
-    "key_push": "Lclick",
+    "key_push": "left",
     "key_pull": "a",
     "key_lift": "d",
     "key_left": "left",
