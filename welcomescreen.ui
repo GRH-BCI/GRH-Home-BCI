@@ -344,7 +344,7 @@ background-color:transparent;
                <string>Power Mobility</string>
               </property>
               <property name="icon">
-               <iconset resource="resources.qrc">
+               <iconset>
                 <normaloff>:/icons/icons/wheelchair.svg</normaloff>:/icons/icons/wheelchair.svg</iconset>
               </property>
               <property name="iconSize">
@@ -535,7 +535,7 @@ border: 1px solid black;
 }</string>
               </property>
               <property name="currentIndex">
-               <number>4</number>
+               <number>2</number>
               </property>
               <widget class="QWidget" name="KeyPage">
                <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -3028,6 +3028,11 @@ QComboBox QListView:item:selected{
                         </item>
                         <item>
                          <property name="text">
+                          <string>Lclick</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
                           <string>1</string>
                          </property>
                         </item>
@@ -3175,6 +3180,11 @@ QComboBox QListView:item:selected{
                         <item>
                          <property name="text">
                           <string>space</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Lclick</string>
                          </property>
                         </item>
                         <item>
@@ -3366,6 +3376,11 @@ QComboBox QListView:item:selected{
                         </item>
                         <item>
                          <property name="text">
+                          <string>Lclick</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
                           <string>1</string>
                          </property>
                         </item>
@@ -3511,6 +3526,11 @@ QComboBox QListView:item:selected{
                         </item>
                         <item>
                          <property name="text">
+                          <string>Lclick</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
                           <string>1</string>
                          </property>
                         </item>
@@ -3652,6 +3672,11 @@ QComboBox QListView:item:selected{
                         <item>
                          <property name="text">
                           <string>space</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Lclick</string>
                          </property>
                         </item>
                         <item>

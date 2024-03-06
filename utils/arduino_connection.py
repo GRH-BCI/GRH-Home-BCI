@@ -16,5 +16,14 @@ def check_arduino_connection():
     else:
         return False
 
+def find_arduino_port():
+    myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
+    myports_desc = [p.description for p in list(serial.tools.list_ports.comports())]
+    for port_desc in myports_desc:
+        if 'arduino' in (str(port_desc)).lower():
+            with open("config.json", "r") as config_file:
+                config = json.load(config_file)
+            config["fes_port"] = myports[myports_desc.index(port_desc)][0]
+            json.dump(config, open("config.json", "w"), indent=4, sort_keys=False)
 
 

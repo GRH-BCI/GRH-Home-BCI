@@ -1,4 +1,5 @@
 from pynput.keyboard import Key, Controller
+
 import threading
 import time
 kb = Controller()
@@ -16,5 +17,5 @@ def press_n_hold(button, duration):
 
 
 def press(button):
-    thread = threading.Thread(target=press_n_hold, args=(str(button), 0.1))
+    thread = threading.Thread(target=press_n_hold, args=((button), 0.1))
     thread.start()
