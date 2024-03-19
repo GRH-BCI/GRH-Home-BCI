@@ -444,6 +444,8 @@ class WelcomeScreen(QDialog):
         self.keyStatLabel.setText(f"Current key mapping:     {key_push}      {key_pull}      "
                                   f"{key_lift}       {key_left}      {key_right}")
         self.smartStatLabel.setText(f"Device activations:    {dev1_act}      {dev2_act}")
+        update_vals = config
+        self.update_ui_parameters()
 
     def set_headset_status(self):
         stat = check_headset_connection()
