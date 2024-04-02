@@ -13,6 +13,8 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # check for arduino connection
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
+
+arduino_connection.find_arduino_port()
 arduino_port = config["fes_port"]
 success_threshold = config["fes_acceptable_dly"]
 try:
@@ -358,7 +360,7 @@ class WelcomeScreen(QDialog):
         self.emotivDlySpinBox.setValue(int(activation_delay))
 
         emotiv_cmnds = ["-", "push", "pull", "lift", "left", "light"]
-        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "1", "2", "3", "4",
+        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "Lclick", "1", "2", "3", "4",
                         "5", "q", "e", "f", "g", "h"]
         self.keyMapPushCombo.setCurrentIndex(key_mappings.index(key_push))
         self.keyMapPullCombo.setCurrentIndex(key_mappings.index(key_pull))
@@ -386,7 +388,7 @@ class WelcomeScreen(QDialog):
         '''
         config = {}
         emotiv_cmnds = ["-", "push", "pull", "lift", "left", "light"]
-        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "1", "2", "3", "4",
+        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "Lclick", "1", "2", "3", "4",
                         "5", "q", "e", "f", "g", "h"]
         config["activation_threshold"] = self.emotivThrshldSlider.value()
         config["activation_delay"] = self.emotivDlySpinBox.value()
@@ -442,6 +444,8 @@ class WelcomeScreen(QDialog):
         self.keyStatLabel.setText(f"Current key mapping:     {key_push}      {key_pull}      "
                                   f"{key_lift}       {key_left}      {key_right}")
         self.smartStatLabel.setText(f"Device activations:    {dev1_act}      {dev2_act}")
+        update_vals = config
+        self.update_ui_parameters()
 
     def set_headset_status(self):
         stat = check_headset_connection()
@@ -468,7 +472,6 @@ class WelcomeScreen(QDialog):
         else:
             self.fesStatLabel.setText("Hub box is NOT connected!")
             self.WCStatLabel.setText("Hub box is NOT connected!")
-
 
     def update_ui(self, update_vals):
         [progress_val, progress_label, keys, devs, headset, arduino_con] = update_vals

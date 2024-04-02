@@ -8,6 +8,9 @@ from utils.press import press
 from pynput.keyboard import Key, Controller
 from utils.handle_dev import handle_device
 import asyncio
+from pynput.mouse import Controller as mouse_controller
+from pynput.mouse import Button as mouse_Button
+from utils.mouse_click import mouse_click
 """
     Emotiv Cortex class. this class includes all the required functions for handling headset data, i.e. 
     training, profile generation, connecting to emotiv cloud services, headset connection, and requesting data 
@@ -423,6 +426,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[0] == 'space':
                     press(Key.space)
+                elif key[0] == 'Lclick':
+                    mouse_click(mouse_Button.left)
                 elif key[0] == 'up':
                     press(Key.up)
                 elif key[0] == 'down':
@@ -442,6 +447,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[1] == 'space':
                     press(Key.space)
+                elif key[1] == 'Lclick':
+                    mouse_click(mouse_Button.left)
                 elif key[1] == 'up':
                     press(Key.up)
                 elif key[1] == 'down':
@@ -462,6 +469,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[2] == 'space':
                     press(Key.space)
+                elif key[2] == 'Lclick':
+                    mouse_click(mouse_Button.left)
                 elif key[2] == 'up':
                     press(Key.up)
                 elif key[2] == 'down':
@@ -480,6 +489,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[4] == 'space':
                     press(Key.space)
+                elif key[4] == 'Lclick':
+                    mouse_click(mouse_Button.left)
                 elif key[4] == 'up':
                     press(Key.up)
                 elif key[4] == 'down':
@@ -497,6 +508,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[5] == 'space':
                     press(Key.space)
+                elif key[5] == 'Lclick':
+                    mouse_click(mouse_Button.left)
                 elif key[5] == 'up':
                     press(Key.up)
                 elif key[5] == 'down':
