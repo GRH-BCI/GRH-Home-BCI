@@ -426,6 +426,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[0] == 'space':
                     press(Key.space)
+                elif key[0] == 'enter':
+                    press(Key.enter)
                 elif key[0] == 'Lclick':
                     mouse_click(mouse_Button.left)
                 elif key[0] == 'up':
@@ -447,6 +449,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[1] == 'space':
                     press(Key.space)
+                elif key[1] == 'enter':
+                    press(Key.enter)
                 elif key[1] == 'Lclick':
                     mouse_click(mouse_Button.left)
                 elif key[1] == 'up':
@@ -469,6 +473,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[2] == 'space':
                     press(Key.space)
+                elif key[2] == 'enter':
+                    press(Key.enter)
                 elif key[2] == 'Lclick':
                     mouse_click(mouse_Button.left)
                 elif key[2] == 'up':
@@ -489,6 +495,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[4] == 'space':
                     press(Key.space)
+                elif key[4] == 'enter':
+                    press(Key.enter)
                 elif key[4] == 'Lclick':
                     mouse_click(mouse_Button.left)
                 elif key[4] == 'up':
@@ -508,6 +516,8 @@ class Cortex(Dispatcher):
                     print("please assign a corresponding keyboard key to this command")
                 elif key[5] == 'space':
                     press(Key.space)
+                elif key[5] == 'enter':
+                    press(Key.enter)
                 elif key[5] == 'Lclick':
                     mouse_click(mouse_Button.left)
                 elif key[5] == 'up':
