@@ -580,32 +580,33 @@ class Cortex(Dispatcher):
             elif com_data['action'] == btn1_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn1' and flag != 'stop'and env == "wc":
                 arduino_serial.write(str.encode('0'))
                 arduino_serial.write(str.encode('N'))
-                time.sleep(.1)
+                # time.sleep(.1)
                 prev_wc_btn = 'btn1'
                 config["time"] = float(com_data['time'])
                 json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
             elif com_data['action'] == btn2_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn2' and flag != 'stop'and env == "wc":
                 arduino_serial.write(str.encode('0'))
                 arduino_serial.write(str.encode('2'))
-                time.sleep(.1)
+                # time.sleep(.1)
                 prev_wc_btn = 'btn2'
                 config["time"] = float(com_data['time'])
                 json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
             elif com_data['action'] == btn3_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn3' and flag != 'stop'and env == "wc":
                 arduino_serial.write(str.encode('0'))
                 arduino_serial.write(str.encode('3'))
-                time.sleep(.1)
+                # time.sleep(.1)
                 prev_wc_btn = 'btn3'
                 config["time"] = float(com_data['time'])
                 json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
             elif com_data['action'] == btn4_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn4' and flag != 'stop'and env == "wc":
                 arduino_serial.write(str.encode('0'))
                 arduino_serial.write(str.encode('4'))
-                time.sleep(.1)
+                # time.sleep(.1)
                 prev_wc_btn = 'btn4'
                 config["time"] = float(com_data['time'])
                 json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
             elif flag != 'stop'and env == "wc" and com_data['action'] == 'neutral':
+                time.sleep(.06)
                 arduino_serial.write(str.encode('0'))
                 arduino_serial.write(str.encode('F'))
                 prev_wc_btn = 'off'
