@@ -569,6 +569,7 @@ class Cortex(Dispatcher):
                 config["time"] = float(com_data['time'])
                 json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
                 prev_state = 'off'
+
             elif com_data['action'] == device_act[0] and 100 * float(com_data['power']) >= int(threshold) and (
                     float(com_data['time']) - temp_time) >= delay and flag != 'stop'and env == "smart-home":
                 asyncio.run(handle_device(device_ip[0], device_duration))

@@ -454,6 +454,7 @@ class WelcomeScreen(QDialog):
             self.smartHeadLabel.setText("Emotiv headset is connected!")
             self.fesHeadLabel.setText("Emotiv headset is connected!")
             self.WCHeadLabel.setText("Emotiv headset is connected!")
+
         else:
             self.keyHeadLabel.setText("Emotiv headset is NOT connected!")
             self.keyHeadLabel.setStyleSheet("color:red;")
