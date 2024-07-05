@@ -19,5 +19,10 @@
     "btn_1": "push",
     "btn_2": "-",
     "btn_3": "-",
-    "btn_4": "-"
+    "btn_4": "-",
+    "spot_play": "push",
+    "spot_pause": "-",
+    "spot_next": "-",
+    "spot_prev": "-",
+    "spot_min_dly": 5
 }

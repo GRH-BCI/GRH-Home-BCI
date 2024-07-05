@@ -7,7 +7,6 @@ import json
 import time
 from utils import *
 from serial import Serial
-
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 # check for arduino connection
@@ -89,6 +88,26 @@ class ThreadClass(QtCore.QObject):
             else:
                 dev2_act = ""
 
+            if config["spot_play"] != "-":
+                spot_play = config["spot_play"]
+            else:
+                spot_play = "-"
+
+            if config["spot_pause"] != "-":
+                spot_pause = config["spot_pause"]
+            else:
+                spot_pause = "-"
+
+            if config["spot_next"] != "-":
+                spot_next = config["spot_next"]
+            else:
+                spot_next = "-"
+
+            if config["spot_prev"] != "-":
+                spot_prev = config["spot_prev"]
+            else:
+                spot_prev = "-"
+
             ard_connection = check_arduino_connection()
             try:
                 c = Cortex(user, debug_mode=False)
@@ -154,7 +173,9 @@ class ThreadClass(QtCore.QObject):
                         keys = {"key_push": key_push, "key_pull": key_pull, "key_lift": key_lift, "key_left": key_left,
                                 "key_right": key_right}
                         devs = {'dev1_act': dev1_act, 'dev2_act': dev2_act}
-                        update_vals = [progress_val, progress_label, keys, devs, headset, arduino_con]
+                        spotify_labels = {"spot_play": spot_play, "spot_pause": spot_pause, "spot_next": spot_next,
+                                          "spot_prev": spot_prev}
+                        update_vals = [progress_val, progress_label, keys, devs, headset, arduino_con, spotify_labels]
                         self.progress.emit(update_vals)
 
             except:
@@ -167,7 +188,9 @@ class ThreadClass(QtCore.QObject):
                 keys = {"key_push": key_push, "key_pull": key_pull, "key_lift": key_lift, "key_left": key_left,
                         "key_right": key_right}
                 devs = {'dev1_act': dev1_act, 'dev2_act': dev2_act}
-                update_vals = [progress_val, progress_label, keys, devs, headset, arduino_con]
+                spotify_labels = {"spot_play": spot_play, "spot_pause": spot_pause, "spot_next": spot_next,
+                                  "spot_prev": spot_prev}
+                update_vals = [progress_val, progress_label, keys, devs, headset, arduino_con, spotify_labels]
                 self.progress.emit(update_vals)
 
 
@@ -200,14 +223,17 @@ class WelcomeScreen(QDialog):
         loadUi("welcomescreen.ui", self)
 
         # self.menu.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
-        self.keyboard.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(0), self.update_borders('keyboard')])
-        self.smarthome.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(1), self.update_borders('smart')])
-        self.fes.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(2), self.update_borders('fes')])
-        self.other.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(3), self.update_borders('other')])
-        self.settings.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(5), self.update_borders('settings')])
-        self.hlp.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(6), self.update_borders('help')])
-        self.wheelchair.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(4), self.update_borders('wheelchair')])
-
+        self.training.clicked.connect(
+            lambda: [self.stackedWidget.setCurrentIndex(0), self.update_borders('TrainingPage')])
+        self.keyboard.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(1), self.update_borders('keyboard')])
+        self.smarthome.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(2), self.update_borders('smart')])
+        self.fes.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(3), self.update_borders('fes')])
+        self.other.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(4), self.update_borders('other')])
+        self.wheelchair.clicked.connect(
+            lambda: [self.stackedWidget.setCurrentIndex(5), self.update_borders('wheelchair')])
+        self.spotify.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(6), self.update_borders('spotify')])
+        self.settings.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(7), self.update_borders('settings')])
+        self.hlp.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(8), self.update_borders('help')])
 
         # Button presses in each page
         # keyboard page
@@ -247,8 +273,18 @@ class WelcomeScreen(QDialog):
         self.WCManualOnBtn_4.pressed.connect(lambda: manual_btn_control(ArduinoSerial, 4))
         self.WCManualOnBtn_4.released.connect(lambda: manual_btn_control(ArduinoSerial, 0))
 
+        # spotify page
+        self.spotifyPlayBtn.clicked.connect(lambda: spotify_handler("play"))
+        self.spotifyPauseBtn_2.clicked.connect(lambda: spotify_handler("pause"))
+        self.spotifyNextBtn.clicked.connect(lambda: spotify_handler("next"))
+        self.spotifyPrevBtn.clicked.connect(lambda: spotify_handler("previous"))
+        self.spotifyCheckBtn.clicked.connect(lambda: self.set_headset_status())
+        self.spotifyStartBtn.clicked.connect(lambda: start_thread("spotify"))
+        self.spotifyPauseBtn.clicked.connect(lambda: stop_thread())
+
         # settings page
         self.saveSettingsBtn.clicked.connect(lambda: self.update_config_file())
+        self.ConnectAPIBtn.clicked.connect(lambda: connect_spotify())
 
         # help page
         self.openManualBtn.clicked.connect(lambda: launch_app("manual"))
@@ -275,6 +311,7 @@ class WelcomeScreen(QDialog):
             manual_btn_control(ArduinoSerial, 4)
         else:
             manual_btn_control(ArduinoSerial, 0)
+
     def update_borders(self, tab):
         self.keyboard.setStyleSheet(
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
@@ -290,11 +327,21 @@ class WelcomeScreen(QDialog):
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
         self.wheelchair.setStyleSheet(
             "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
+        self.training.setStyleSheet(
+            "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
+        self.spotify.setStyleSheet(
+            "text-align:left;border:none;padding: 2px 5px;color:white;margin:0;background-color:transparent;")
         if tab == 'keyboard':
             self.keyboard.setStyleSheet(
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
         elif tab == 'smart':
             self.smarthome.setStyleSheet(
+                "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
+        elif tab == 'TrainingPage':
+            self.training.setStyleSheet(
+                "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
+        elif tab == 'spotify':
+            self.spotify.setStyleSheet(
                 "text-align:left;border:none;padding: 2px 5px;border-top : 3px solid rgb(93, 88, 255);border-bottom: 3px solid rgb(93, 88, 255);color:rgb(93, 88, 255);margin:0;background-color:transparent;")
         elif tab == 'fes':
             self.fes.setStyleSheet(
@@ -355,13 +402,22 @@ class WelcomeScreen(QDialog):
             "debit": user_info["debit"]
         }
 
+        with open("spotify.json", "r") as spot_config_file:
+            spot_config = json.load(spot_config_file)
+        spotify_client_ID = spot_config['client_id']
+        spotify_client_secret = spot_config['client_secret']
+        spotify_redirect_url = spot_config['redirect_uri']
+
+
         # set initial values for the UI
         self.emotivThrshldSlider.setValue(int(activation_threshold))
         self.emotivDlySpinBox.setValue(int(activation_delay))
 
         emotiv_cmnds = ["-", "push", "pull", "lift", "left", "light"]
-        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "Lclick", "1", "2", "3", "4",
+        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "Lclick", "1", "2",
+                        "3", "4",
                         "5", "q", "e", "f", "g", "h"]
+
         self.keyMapPushCombo.setCurrentIndex(key_mappings.index(key_push))
         self.keyMapPullCombo.setCurrentIndex(key_mappings.index(key_pull))
         self.keyMapLiftCombo.setCurrentIndex(key_mappings.index(key_lift))
@@ -381,6 +437,9 @@ class WelcomeScreen(QDialog):
         self.wcCombo_2.setCurrentIndex(emotiv_cmnds.index(btn_2))
         self.wcCombo_3.setCurrentIndex(emotiv_cmnds.index(btn_3))
         self.wcCombo_4.setCurrentIndex(emotiv_cmnds.index(btn_4))
+        self.APITokenLine.setText(str(spotify_client_ID))
+        self.APISecretLine.setText(str(spotify_client_secret))
+        self.APIurlLine.setText(str(spotify_redirect_url))
 
     def update_config_file(self):
         '''
@@ -388,7 +447,8 @@ class WelcomeScreen(QDialog):
         '''
         config = {}
         emotiv_cmnds = ["-", "push", "pull", "lift", "left", "light"]
-        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "Lclick", "1", "2", "3", "4",
+        key_mappings = ["-", "w", "a", "s", "d", "up", "down", "left", "right", "enter", "space", "Lclick", "1", "2",
+                        "3", "4",
                         "5", "q", "e", "f", "g", "h"]
         config["activation_threshold"] = self.emotivThrshldSlider.value()
         config["activation_delay"] = self.emotivDlySpinBox.value()
@@ -411,6 +471,8 @@ class WelcomeScreen(QDialog):
         config["btn_2"] = emotiv_cmnds[self.wcCombo_2.currentIndex()]
         config["btn_3"] = emotiv_cmnds[self.wcCombo_3.currentIndex()]
         config["btn_4"] = emotiv_cmnds[self.wcCombo_4.currentIndex()]
+
+        ####### add in spotify settings save
 
         json.dump(config, open("config.json", "w"), indent=4, sort_keys=False)
         if config["key_push"] != "-":
@@ -441,9 +503,33 @@ class WelcomeScreen(QDialog):
             dev2_act = "Device 2: " + config["dev2_act"]
         else:
             dev2_act = ""
+
+        if config["spot_play"] != "-":
+            spot_play = config["spot_play"]
+        else:
+            spot_play = "-"
+
+        if config["spot_pause"] != "-":
+            spot_pause = config["spot_pause"]
+        else:
+            spot_pause = "-"
+
+        if config["spot_next"] != "-":
+            spot_next = config["spot_next"]
+        else:
+            spot_next = "-"
+
+        if config["spot_prev"] != "-":
+            spot_prev = config["spot_prev"]
+        else:
+            spot_prev = "-"
+
+
+
         self.keyStatLabel.setText(f"Current key mapping:     {key_push}      {key_pull}      "
                                   f"{key_lift}       {key_left}      {key_right}")
         self.smartStatLabel.setText(f"Device activations:    {dev1_act}      {dev2_act}")
+        self.spotifyStatLabel.setText(f"Play:{spot_play}    Pause:{spot_pause}     Next:{spot_next}      Previous:{spot_prev}")
         update_vals = config
         self.update_ui_parameters()
 
@@ -454,7 +540,7 @@ class WelcomeScreen(QDialog):
             self.smartHeadLabel.setText("Emotiv headset is connected!")
             self.fesHeadLabel.setText("Emotiv headset is connected!")
             self.WCHeadLabel.setText("Emotiv headset is connected!")
-
+            self.spotifyHeadLabel.setText("Emotiv headset is connected!")
         else:
             self.keyHeadLabel.setText("Emotiv headset is NOT connected!")
             self.keyHeadLabel.setStyleSheet("color:red;")
@@ -464,6 +550,8 @@ class WelcomeScreen(QDialog):
             self.fesHeadLabel.setStyleSheet("color:red;")
             self.WCHeadLabel.setText.setText("Emotiv headset is NOT connected!")
             self.WCHeadLabel.setStyleSheet("color:red;")
+            self.spotifyHeadLabel.setText("Emotiv headset is NOT connected!")
+            self.spotifyHeadLabel.setStyleSheet("color:red;")
 
     def set_arduino_status(self):
         arduino_Stat = check_arduino_connection
@@ -475,27 +563,34 @@ class WelcomeScreen(QDialog):
             self.WCStatLabel.setText("Hub box is NOT connected!")
 
     def update_ui(self, update_vals):
-        [progress_val, progress_label, keys, devs, headset, arduino_con] = update_vals
+        [progress_val, progress_label, keys, devs, headset, arduino_con, spotify_labels] = update_vals
         self.keyLabel.setText(progress_label)
         self.keyProgressBar.setValue(progress_val)
         self.smartLabel.setText(progress_label)
         self.smartProgressBar.setValue(progress_val)
         self.fesLabel.setText(progress_label)
         self.fesProgressBar.setValue(progress_val)
+        self.spotifyLabel.setText(progress_label)
+        self.spotifyProgressBar.setValue(progress_val)
         self.WCProgressBar.setValue(progress_val)
         self.WCLabel.setText(progress_label)
+
         self.keyStatLabel.setText(f"Current key mapping:     {keys['key_push']}      {keys['key_pull']}      "
                                   f"{keys['key_lift']}       {keys['key_left']}      {keys['key_right']}")
+        self.spotifyStatLabel.setText(f"Play:{spotify_labels['spot_play']}      Pause:{spotify_labels['spot_pause']}"
+                                      f"    Next:{spotify_labels['spot_next']}      Previous:{spotify_labels['spot_prev']}")
         self.smartStatLabel.setText(f"Device activations:    {devs['dev1_act']}      {devs['dev2_act']}")
         if headset:
             self.keyHeadLabel.setText("Emotiv headset is connected!")
             self.smartHeadLabel.setText("Emotiv headset is connected!")
             self.fesHeadLabel.setText("Emotiv headset is connected!")
             self.WCHeadLabel.setText("Emotiv headset is connected!")
+            self.spotifyHeadLabel.setText("Emotiv headset is connected!")
             self.keyHeadLabel.setStyleSheet("color:white;")
             self.smartHeadLabel.setStyleSheet("color:white;")
             self.fesHeadLabel.setStyleSheet("color:white;")
             self.WCHeadLabel.setStyleSheet("color:white;")
+            self.spotifyHeadLabel.setStyleSheet("color:white;")
         else:
             self.keyLabel.setText("--")
             self.keyProgressBar.setValue(0)
@@ -503,6 +598,8 @@ class WelcomeScreen(QDialog):
             self.smartProgressBar.setValue(0)
             self.fesLabel.setText("--")
             self.fesProgressBar.setValue(0)
+            self.spotifyLabel.setText("--")
+            self.spotifyProgressBar.setValue(0)
             self.keyHeadLabel.setText("Emotiv headset is NOT connected!")
             self.keyHeadLabel.setStyleSheet("color:red;")
             self.smartHeadLabel.setText("Emotiv headset is NOT connected!")
@@ -511,7 +608,8 @@ class WelcomeScreen(QDialog):
             self.fesHeadLabel.setStyleSheet("color:red;")
             self.WCHeadLabel.setText("Emotiv headset is NOT connected!")
             self.WCHeadLabel.setStyleSheet("color:red;")
-
+            self.spotifyHeadLabel.setText("Emotiv headset is NOT connected!")
+            self.spotifyHeadLabel.setStyleSheet("color:red;")
 
         if arduino_con:
             self.fesStatLabel.setText("Hub box connected!")
@@ -557,6 +655,7 @@ def headset_thread(env, ArduinoSerial):
     device_act = [config["dev1_act"], config["dev2_act"]]
     device_duration = config["smart_on_period"]
     btn_action = [config["btn_1"], config["btn_2"], config["btn_3"], config["btn_4"]]
+    spotify_cmd = [config["spot_play"], config["spot_pause"], config["spot_next"], config["spot_prev"], config['spot_min_dly']]
     with open("user.json", "r") as user_file:
         user_info = json.load(user_file)
     user = {
@@ -581,8 +680,10 @@ def headset_thread(env, ArduinoSerial):
         prev = 'off'
         prev_wc_btn = 'off'
         while True:
-            prev, last_act, prev_wc_btn = c.sub_request_GRH(stream, threshold, dly, key, ArduinoSerial, triggers, min_dly, flag, env,
-                                               prev, device_ip, device_act, device_duration, prev_wc_btn, btn_action)
+            prev, last_act, prev_wc_btn = c.sub_request_GRH(stream, threshold, dly, key, ArduinoSerial, triggers,
+                                                            min_dly, flag, env,
+                                                            prev, device_ip, device_act, device_duration, prev_wc_btn,
+                                                            btn_action, spotify_cmd)
             if last_act:
                 activations.append(last_act)
             print(activations)

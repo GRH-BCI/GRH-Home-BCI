@@ -55,10 +55,3 @@ print(res)
 
 res = sp.devices()
 
-
-sp.artist_related_artists('134412')
-
-
-# Change track
-# sp.start_playback(uris=['spotify:track:6gdLoMygLsgktydTQ71b15'])
-sp.pause_playback()

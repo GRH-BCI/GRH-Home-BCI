@@ -7,6 +7,7 @@ from pydispatch.dispatch import Dispatcher
 from utils.press import press
 from pynput.keyboard import Key, Controller
 from utils.handle_dev import handle_device
+from utils.spotify import spotify_handler
 import asyncio
 from pynput.mouse import Controller as mouse_controller
 from pynput.mouse import Button as mouse_Button
@@ -356,7 +357,7 @@ class Cortex(Dispatcher):
             else:
                 print(new_data)
 
-    def sub_request_GRH(self, stream, threshold, delay, key, arduino_serial, triggers, min_dly, flag, env, prev_state,device_ip,device_act, device_duration, prev_wc_btn, btn_action):
+    def sub_request_GRH(self, stream, threshold, delay, key, arduino_serial, triggers, min_dly, flag, env, prev_state,device_ip,device_act, device_duration, prev_wc_btn, btn_action, spotify_cmd):
         print('subscribe request --------------------------------')
         sub_request_json = {
             "jsonrpc": "2.0",
@@ -419,6 +420,11 @@ class Cortex(Dispatcher):
             btn2_action = str(btn_action[1])
             btn3_action = str(btn_action[2])
             btn4_action = str(btn_action[3])
+            spotify_play_cmd = str(spotify_cmd[0])
+            spotify_pause_cmd = str(spotify_cmd[1])
+            spotify_next_cmd = str(spotify_cmd[2])
+            spotify_prev_cmd = str(spotify_cmd[3])
+            spotify_min_dly = spotify_cmd[4]
 
             if com_data['action'] == 'push' and 100 * float(com_data['power']) >= int(threshold) and (
                     float(com_data['time']) - temp_time) >= delay and flag != 'stop' and env == "keyboard":
@@ -569,6 +575,19 @@ class Cortex(Dispatcher):
                 config["time"] = float(com_data['time'])
                 json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
                 prev_state = 'off'
+
+            elif com_data['action'] == spotify_play_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(com_data['time']) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("play")
+            elif com_data['action'] == spotify_pause_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(com_data['time']) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("pause")
+            elif com_data['action'] == spotify_next_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(com_data['time']) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("next")
+            elif com_data['action'] == spotify_prev_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(com_data['time']) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("previous")
 
             elif com_data['action'] == device_act[0] and 100 * float(com_data['power']) >= int(threshold) and (
                     float(com_data['time']) - temp_time) >= delay and flag != 'stop'and env == "smart-home":

@@ -10,3 +10,4 @@ from .fes_manual_control import manual_stop, manual_start
 from .generate_report import generate_report
 from .wc_manual_control import manual_btn_control
 from .spotify import spotify_handler
+from .connect_spotify import connect_spotify
