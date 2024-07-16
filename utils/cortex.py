@@ -577,6 +577,7 @@ class Cortex(Dispatcher):
                         float(com_data['time']) - temp_time) >= delay and flag != 'stop' and env == "smart-home":
                 asyncio.run(handle_device(device_ip[1], device_duration))
 
+
             elif com_data['action'] == btn1_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn1' and flag != 'stop'and env == "wc":
                 arduino_serial.write(str.encode('0'))
                 arduino_serial.write(str.encode('N'))
