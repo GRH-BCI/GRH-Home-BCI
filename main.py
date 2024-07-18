@@ -25,15 +25,6 @@ try:
 except:
     ArduinoSerial = False
 
-with open("user.json", "r") as user_file:
-    user_info = json.load(user_file)
-user = {
-    "license": user_info["license"],
-    "client_id": user_info["client_id"],
-    "client_secret": user_info["client_secret"],
-    "debit": user_info["debit"]
-}
-
 global flag, activations, targets
 
 flag = 'go'
@@ -224,9 +215,6 @@ class WelcomeScreen(QDialog):
         self.keyPauseBtn.clicked.connect(lambda: stop_thread())
         self.keyCheckBtn.clicked.connect(lambda: self.set_headset_status())
 
-        #training page
-        self.NeutralBtn.clicked.connect(lambda: train_mental_cmd(user,'neutral'))
-
         # smart-home page
         self.smartCheckBtn.clicked.connect(lambda: self.set_headset_status())
         self.smartStartBtn.clicked.connect(lambda: start_thread("smart-home"))
@@ -393,8 +381,6 @@ class WelcomeScreen(QDialog):
         self.wcCombo_2.setCurrentIndex(emotiv_cmnds.index(btn_2))
         self.wcCombo_3.setCurrentIndex(emotiv_cmnds.index(btn_3))
         self.wcCombo_4.setCurrentIndex(emotiv_cmnds.index(btn_4))
-
-
 
     def update_config_file(self):
         '''

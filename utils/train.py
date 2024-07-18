@@ -136,7 +136,8 @@ class Train():
 
             print('start training {0} time {1} ---------------'.format(training_action, num_train))
             print('\n')
-            status='start'          
+            status='start'
+            #add animation for 8 seconds of training
             self.c.train_request(detection='mentalCommand',
                                 action=training_action,
                                 status=status)
