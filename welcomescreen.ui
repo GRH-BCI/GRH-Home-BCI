@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1052</width>
-    <height>823</height>
+    <height>822</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    <string>Dialog</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/photos/logo.png</normaloff>:/photos/logo.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
@@ -180,6 +180,10 @@ background-color:transparent;
               </property>
               <property name="text">
                <string>Training</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/icons/icons/train.svg</normaloff>:/icons/icons/train.svg</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -373,7 +377,7 @@ background-color:transparent;
                <string>Power Mobility</string>
               </property>
               <property name="icon">
-               <iconset>
+               <iconset resource="resources.qrc">
                 <normaloff>:/icons/icons/wheelchair.svg</normaloff>:/icons/icons/wheelchair.svg</iconset>
               </property>
               <property name="iconSize">
@@ -404,6 +408,10 @@ background-color:transparent;
               </property>
               <property name="text">
                <string>Spotify</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/icons/icons/spotify.svg</normaloff>:/icons/icons/spotify.svg</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -593,7 +601,7 @@ border: 1px solid black;
 }</string>
               </property>
               <property name="currentIndex">
-               <number>7</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="TrainingPage">
                <layout class="QHBoxLayout" name="horizontalLayout_27">
@@ -625,7 +633,7 @@ border: 1px solid black;
                         </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_28">
                          <item>
-                          <widget class="QPushButton" name="pushButton">
+                          <widget class="QPushButton" name="NeutTrn">
                            <property name="maximumSize">
                             <size>
                              <width>150</width>
@@ -659,6 +667,13 @@ QPushButton:pressed{
                            </property>
                           </widget>
                          </item>
+                         <item>
+                          <widget class="QLabel" name="NeutralLabel">
+                           <property name="text">
+                            <string>0</string>
+                           </property>
+                          </widget>
+                         </item>
                         </layout>
                        </widget>
                       </item>
@@ -672,7 +687,7 @@ QPushButton:pressed{
                         </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_29">
                          <item>
-                          <widget class="QPushButton" name="pushButton_2">
+                          <widget class="QPushButton" name="PushTrn">
                            <property name="maximumSize">
                             <size>
                              <width>150</width>
@@ -702,7 +717,14 @@ QPushButton:pressed{
 </string>
                            </property>
                            <property name="text">
-                            <string>Train Push</string>
+                            <string>  Train Push  </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="PushLabel">
+                           <property name="text">
+                            <string>0</string>
                            </property>
                           </widget>
                          </item>
@@ -719,7 +741,7 @@ QPushButton:pressed{
                         </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_30">
                          <item>
-                          <widget class="QPushButton" name="pushButton_3">
+                          <widget class="QPushButton" name="PullTrn">
                            <property name="maximumSize">
                             <size>
                              <width>150</width>
@@ -749,7 +771,14 @@ QPushButton:pressed{
 </string>
                            </property>
                            <property name="text">
-                            <string>Train Pull</string>
+                            <string>    Train Pull   </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="PullLabel">
+                           <property name="text">
+                            <string>0</string>
                            </property>
                           </widget>
                          </item>
@@ -766,7 +795,7 @@ QPushButton:pressed{
                         </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_31">
                          <item>
-                          <widget class="QPushButton" name="pushButton_4">
+                          <widget class="QPushButton" name="LiftTrn">
                            <property name="maximumSize">
                             <size>
                              <width>150</width>
@@ -796,7 +825,14 @@ QPushButton:pressed{
 </string>
                            </property>
                            <property name="text">
-                            <string>Train Lift</string>
+                            <string>    Train Lift   </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="LiftLabel">
+                           <property name="text">
+                            <string>0</string>
                            </property>
                           </widget>
                          </item>
@@ -813,7 +849,7 @@ QPushButton:pressed{
                         </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_32">
                          <item>
-                          <widget class="QPushButton" name="pushButton_5">
+                          <widget class="QPushButton" name="DropTrn">
                            <property name="maximumSize">
                             <size>
                              <width>150</width>
@@ -843,12 +879,32 @@ QPushButton:pressed{
 </string>
                            </property>
                            <property name="text">
-                            <string>Train Drop</string>
+                            <string>  Train Drop  </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="DropLabel">
+                           <property name="text">
+                            <string>0</string>
                            </property>
                           </widget>
                          </item>
                         </layout>
                        </widget>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_7">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
                       </item>
                       <item>
                        <widget class="QFrame" name="frame_55">
@@ -860,7 +916,36 @@ QPushButton:pressed{
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_31">
                          <item>
-                          <widget class="QPushButton" name="pushButton_9">
+                          <widget class="QPushButton" name="SelectImageBtn">
+                           <property name="styleSheet">
+                            <string notr="true">QPushButton{
+	background-color:rgb(68, 77, 93);
+	color:rgb(255, 255, 255);
+	padding: 5px 10px; 
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-left: 2px solidrgb(135, 153, 184);
+	border-right: 2px solidrgb(135, 153, 184);
+	border-top: 2px solidrgb(135, 153, 184);
+	border-bottom: 2px solidrgb(135, 153, 184);
+}
+QPushButton:hover{
+	background-color:rgb(148, 168, 202);
+}
+QPushButton:pressed{
+	background-color:rgb(143, 255, 130);
+}
+</string>
+                           </property>
+                           <property name="text">
+                            <string>Select Image</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="LiveModeBtn">
                            <property name="styleSheet">
                             <string notr="true">QPushButton{
 	background-color:rgb(68, 77, 93);
@@ -889,7 +974,7 @@ QPushButton:pressed{
                           </widget>
                          </item>
                          <item>
-                          <widget class="QPushButton" name="pushButton_8">
+                          <widget class="QPushButton" name="BrainMapBtn">
                            <property name="styleSheet">
                             <string notr="true">QPushButton{
 	background-color:rgb(68, 77, 93);
@@ -932,10 +1017,87 @@ QPushButton:pressed{
                       <enum>QFrame::Raised</enum>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_32">
+                      <item alignment="Qt::AlignTop">
+                       <widget class="QFrame" name="frame_54">
+                        <property name="frameShape">
+                         <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                         <enum>QFrame::Raised</enum>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout_33">
+                         <item>
+                          <widget class="QLineEdit" name="ProfileLine">
+                           <property name="text">
+                            <string>Enter profile name here </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <spacer name="horizontalSpacer_23">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="CrtProfile">
+                           <property name="styleSheet">
+                            <string notr="true">QPushButton{
+	background-color:rgb(68, 77, 93);
+	color:rgb(255, 255, 255);
+	padding: 5px 10px; 
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-left: 2px solidrgb(135, 153, 184);
+	border-right: 2px solidrgb(135, 153, 184);
+	border-top: 2px solidrgb(135, 153, 184);
+	border-bottom: 2px solidrgb(135, 153, 184);
+}
+QPushButton:hover{
+	background-color:rgb(148, 168, 202);
+}
+QPushButton:pressed{
+	background-color:rgb(143, 255, 130);
+}
+</string>
+                           </property>
+                           <property name="text">
+                            <string>Create profile</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
                       <item>
-                       <widget class="QFrame" name="frame_53">
+                       <spacer name="verticalSpacer_8">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Fixed</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QFrame" name="TrainSpriteFrame">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -952,149 +1114,75 @@ QPushButton:pressed{
                         <property name="frameShadow">
                          <enum>QFrame::Raised</enum>
                         </property>
-                        <widget class="QLabel" name="label_31">
-                         <property name="geometry">
-                          <rect>
-                           <x>240</x>
-                           <y>240</y>
-                           <width>150</width>
-                           <height>150</height>
-                          </rect>
-                         </property>
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>150</width>
-                           <height>150</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>300</width>
-                           <height>300</height>
-                          </size>
-                         </property>
-                         <property name="sizeIncrement">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="baseSize">
-                          <size>
-                           <width>150</width>
-                           <height>150</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string/>
-                         </property>
-                         <property name="pixmap">
-                          <pixmap resource="resources.qrc">:/photos/Assets/frog.png</pixmap>
-                         </property>
-                         <property name="scaledContents">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
+                        <layout class="QGridLayout" name="gridLayout">
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="TrainSprite">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>150</height>
+                            </size>
+                           </property>
+                           <property name="maximumSize">
+                            <size>
+                             <width>300</width>
+                             <height>300</height>
+                            </size>
+                           </property>
+                           <property name="sizeIncrement">
+                            <size>
+                             <width>0</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                           <property name="baseSize">
+                            <size>
+                             <width>150</width>
+                             <height>150</height>
+                            </size>
+                           </property>
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="pixmap">
+                            <pixmap resource="resources.qrc">:/photos/Assets/frog.png</pixmap>
+                           </property>
+                           <property name="scaledContents">
+                            <bool>true</bool>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QFrame" name="frame_54">
+                       <widget class="QFrame" name="frame_53">
                         <property name="frameShape">
                          <enum>QFrame::StyledPanel</enum>
                         </property>
                         <property name="frameShadow">
                          <enum>QFrame::Raised</enum>
                         </property>
-                        <layout class="QHBoxLayout" name="horizontalLayout_33">
-                         <item>
-                          <spacer name="horizontalSpacer_23">
-                           <property name="orientation">
-                            <enum>Qt::Horizontal</enum>
-                           </property>
-                           <property name="sizeHint" stdset="0">
-                            <size>
-                             <width>40</width>
-                             <height>20</height>
-                            </size>
-                           </property>
-                          </spacer>
-                         </item>
-                         <item>
-                          <widget class="QPushButton" name="pushButton_6">
-                           <property name="styleSheet">
-                            <string notr="true">QPushButton{
-	background-color:rgb(68, 77, 93);
-	color:rgb(255, 255, 255);
-	padding: 5px 10px; 
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
-	border-left: 2px solidrgb(135, 153, 184);
-	border-right: 2px solidrgb(135, 153, 184);
-	border-top: 2px solidrgb(135, 153, 184);
-	border-bottom: 2px solidrgb(135, 153, 184);
-}
-QPushButton:hover{
-	background-color:rgb(148, 168, 202);
-}
-QPushButton:pressed{
-	background-color:rgb(143, 255, 130);
-}
-</string>
+                        <layout class="QGridLayout" name="gridLayout_2">
+                         <item row="0" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+                          <widget class="QLabel" name="timerLabel">
+                           <property name="font">
+                            <font>
+                             <pointsize>14</pointsize>
+                             <weight>75</weight>
+                             <bold>true</bold>
+                            </font>
                            </property>
                            <property name="text">
-                            <string>Accept</string>
+                            <string>10</string>
                            </property>
                           </widget>
-                         </item>
-                         <item>
-                          <widget class="QPushButton" name="pushButton_7">
-                           <property name="styleSheet">
-                            <string notr="true">QPushButton{
-	background-color:rgb(68, 77, 93);
-	color:rgb(255, 255, 255);
-	padding: 5px 10px; 
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
-	border-left: 2px solidrgb(135, 153, 184);
-	border-right: 2px solidrgb(135, 153, 184);
-	border-top: 2px solidrgb(135, 153, 184);
-	border-bottom: 2px solidrgb(135, 153, 184);
-}
-QPushButton:hover{
-	background-color:rgb(148, 168, 202);
-}
-QPushButton:pressed{
-	background-color:rgb(143, 255, 130);
-}
-</string>
-                           </property>
-                           <property name="text">
-                            <string>Reject</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item>
-                          <spacer name="horizontalSpacer_24">
-                           <property name="orientation">
-                            <enum>Qt::Horizontal</enum>
-                           </property>
-                           <property name="sizeHint" stdset="0">
-                            <size>
-                             <width>40</width>
-                             <height>20</height>
-                            </size>
-                           </property>
-                          </spacer>
                          </item>
                         </layout>
                        </widget>
@@ -6275,6 +6363,7 @@ QPushButton:pressed{
  </widget>
  <resources>
   <include location="resources.qrc"/>
+  <include location="C:/Users/hosei/.designer/backup/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

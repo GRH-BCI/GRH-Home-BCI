@@ -27,3 +27,4 @@ def find_arduino_port():
             json.dump(config, open("config.json", "w"), indent=4, sort_keys=False)
 
 
+

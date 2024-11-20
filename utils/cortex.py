@@ -40,6 +40,7 @@ MENTAL_COMMAND_ACTIVE_ACTION_ID = 16
 MENTAL_COMMAND_BRAIN_MAP_ID = 17
 MENTAL_COMMAND_TRAINING_THRESHOLD = 18
 SET_MENTAL_COMMAND_ACTIVE_ACTION_ID = 19
+GET_TRAINING_DATA = 20
 
 class Cortex(Dispatcher):
     def __init__(self, user, debug_mode=False):
@@ -421,6 +422,7 @@ class Cortex(Dispatcher):
             btn3_action = str(btn_action[2])
             btn4_action = str(btn_action[3])
             spotify_play_cmd = str(spotify_cmd[0])
+            print(spotify_play_cmd)
             spotify_pause_cmd = str(spotify_cmd[1])
             spotify_next_cmd = str(spotify_cmd[2])
             spotify_prev_cmd = str(spotify_cmd[3])
@@ -800,6 +802,39 @@ class Cortex(Dispatcher):
                 # success or complete, break the wait
                 if result_dic['sys'][1] == wanted_result:
                     break
+
+    def get_training_data(self, profile_name):
+        print('getting profiles trained data --------------- ')
+        get_training_json = {
+            "jsonrpc": "2.0",
+            "method": "getTrainedSignatureActions",
+            "params": {
+                "cortexToken": self.auth,
+                "detection": "mentalCommand",
+                "profile": profile_name
+            },
+            "id": GET_TRAINING_DATA
+        }
+        self.ws.send(json.dumps(get_training_json))
+        result = self.ws.recv()
+        result_dic = json.loads(result)
+        return result_dic
+
+    def brain_map(self, profile_name):
+        print('brain map plot --------------- ')
+        brain_map_json = {
+            "jsonrpc": "2.0",
+            "method": "mentalCommandBrainMap",
+            "params": {
+                "cortexToken": self.auth,
+                "profile": profile_name,
+                "session": self.session_id
+            }
+        }
+        self.ws.send(json.dumps(brain_map_json))
+        result = self.ws.recv()
+        result_dic = json.loads(result)
+        return result_dic
 
     def create_record(self,
                       record_name,

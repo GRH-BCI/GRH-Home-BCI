@@ -7,8 +7,11 @@ import json
 import time
 from utils import *
 from serial import Serial
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
-
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, QRect, QPropertyAnimation
+from PyQt5 import QtGui
+from PIL import Image
+from pyqtgraph import PlotWidget, plot
+import pyqtgraph as pg
 # check for arduino connection
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
@@ -111,7 +114,7 @@ class ThreadClass(QtCore.QObject):
             ard_connection = check_arduino_connection()
             try:
                 c = Cortex(user, debug_mode=False)
-                t = train.Train()
+                t = train.Train(user)
                 c.bind(new_com_data=t.on_new_data)
                 c.do_prepare_steps()
                 c.sub_request(['sys'])
@@ -179,7 +182,7 @@ class ThreadClass(QtCore.QObject):
                         self.progress.emit(update_vals)
 
             except:
-                print('except')
+                print('except2')
                 progress_label = "--"
                 progress_val = 0
                 headset = False
@@ -193,8 +196,7 @@ class ThreadClass(QtCore.QObject):
                 update_vals = [progress_val, progress_label, keys, devs, headset, arduino_con, spotify_labels]
                 self.progress.emit(update_vals)
 
-
-'''
+    '''
     main UI class that loads the welcomescreen.ui file. welcomescreen.ui is generated using pyqt designer app and 
     can be editted in designer if needed. in order to lead the requried resources, there is a resources.qrc file 
     included the main path folder. resources.qrc is generated from resources.qrc. if you need to add new icons in desiner 
@@ -211,9 +213,7 @@ class ThreadClass(QtCore.QObject):
     set_arduino_status: checks for arduino connectivity and updates Hub box connectivity label in smart-home page 
     update_ui: takes in the emitted values from ThreadClass object as input and updates ui feature based on values 
     coming from the headset.    
-    runner: starts the worker and updater thread for updating the ui parameters 
-    
-    
+    runner: starts the worker and updater thread for updating the ui parameters   
     '''
 
 
@@ -221,6 +221,9 @@ class WelcomeScreen(QDialog):
     def __init__(self):
         super(WelcomeScreen, self).__init__()
         loadUi("welcomescreen.ui", self)
+        self.profile_name = ''
+        self.time_left_int = 10
+        self.myTimer = QtCore.QTimer(self)
 
         # self.menu.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
         self.training.clicked.connect(
@@ -236,6 +239,41 @@ class WelcomeScreen(QDialog):
         self.hlp.clicked.connect(lambda: [self.stackedWidget.setCurrentIndex(8), self.update_borders('help')])
 
         # Button presses in each page
+        # training page
+        self.NeutralLabelCounter = 0
+        self.NeutralLabel.setText(str(self.NeutralLabelCounter))
+        self.PushLabelCounter = 0
+        self.PushLabel.setText(str(self.PushLabelCounter))
+        self.PullLabelCounter = 0
+        self.PullLabel.setText(str(self.PullLabelCounter))
+        self.LiftLabelCounter = 0
+        self.LiftLabel.setText(str(self.LiftLabelCounter))
+        self.DropLabelCounter = 0
+        self.DropLabel.setText(str(self.DropLabelCounter))
+        self.BrainMapBtn.clicked.connect(lambda: self.plot_brain_map())
+        self.SelectImageBtn.clicked.connect(lambda: self.openImagePopUp())
+        self.NeutTrn.clicked.connect(
+            lambda: [self.resize_animation('neutral'), train_MC(self.get_user_prof(), self.profile_name, 'neutral'),
+                     self.update_counter_label('neutral'), self.startTimer()])
+        self.PushTrn.clicked.connect(
+            lambda: [self.resize_animation('push'), train_MC(self.get_user_prof(), self.profile_name, 'push'),
+                     self.update_counter_label('push'), self.startTimer()])
+        self.PullTrn.clicked.connect(
+            lambda: [self.resize_animation('pull'), train_MC(self.get_user_prof(), self.profile_name, 'pull'),
+                     self.update_counter_label('pull'), self.startTimer()])
+        self.LiftTrn.clicked.connect(
+            lambda: [self.resize_animation('lift'), train_MC(self.get_user_prof(), self.profile_name, 'lift'),
+                     self.update_counter_label('lift'), self.startTimer()])
+        self.DropTrn.clicked.connect(
+            lambda: [self.resize_animation('drop'), train_MC(self.get_user_prof(), self.profile_name, 'drop'),
+                     self.update_counter_label('drop'), self.startTimer()])
+        self.NeutTrn.setDisabled(True)
+        self.PushTrn.setDisabled(True)
+        self.PullTrn.setDisabled(True)
+        self.LiftTrn.setDisabled(True)
+        self.DropTrn.setDisabled(True)
+        self.CrtProfile.clicked.connect(lambda: self.CreateProfile())
+
         # keyboard page
         self.keyStartBtn.clicked.connect(lambda: start_thread("keyboard"))
         self.keyPauseBtn.clicked.connect(lambda: stop_thread())
@@ -294,6 +332,34 @@ class WelcomeScreen(QDialog):
         self.set_arduino_status()
         self.runner()
 
+
+
+    def openImagePopUp(self):
+        path = QFileDialog.getOpenFileNames(self, 'Choose mental image object:', '.\\Assets', "Image files (*.png)")
+        sprite = Image.open(path[0][0])
+        if 500 <= sprite.width <= 550 and 500<= sprite.height<= 550:
+            self.SpritePath = path[0][0]
+            SpritePixMap = QPixmap(self.SpritePath)
+            self.TrainSprite.setPixmap(SpritePixMap)
+        else:
+            warningMsg = QMessageBox()
+            warningMsg.setWindowTitle("Oops Wrong image!")
+            warningMsg.setText("Image has to be 500x500 pixels and in png format!")
+            warningMsg.exec_()
+
+    def startTimer(self):
+        self.time_left_int = 10
+        self.myTimer.timeout.connect(self.timerTimeout)
+        self.myTimer.setInterval(1000)
+        self.myTimer.start()
+
+    def timerTimeout(self):
+        self.time_left_int -= 1
+        if self.time_left_int == 0:
+            self.myTimer.stop()
+            self.myTimer.timeout.disconnect(self.timerTimeout)
+        self.timerLabel.setText(str(self.time_left_int))
+
     def btnstate(self):
         if self.WCManualOnBtn_1.isChecked():
             manual_btn_control(ArduinoSerial, 1)
@@ -311,6 +377,129 @@ class WelcomeScreen(QDialog):
             manual_btn_control(ArduinoSerial, 4)
         else:
             manual_btn_control(ArduinoSerial, 0)
+
+    def resize_animation(self, cmd):
+        frame_obj = self.TrainSprite
+        if cmd == 'push':
+            self.animation_1 = QPropertyAnimation(frame_obj, b'size')
+            self.myTimer = QtCore.QTimer(self)
+            self.animation_1.setStartValue(QSize(frame_obj.width(), frame_obj.height()))
+            self.animation_1.setEndValue(QSize(round(frame_obj.width() / 3), round(frame_obj.height() / 3)))
+            self.animation_1.setDuration(9500)
+            self.animation_2 = QPropertyAnimation(frame_obj, b'size')
+            self.animation_2.setEndValue(QSize(round(frame_obj.width()), round(frame_obj.height())))
+            self.animation_2.setDuration(500)
+            self.anim_group = QSequentialAnimationGroup()
+            self.anim_group.addAnimation(self.animation_1)
+            self.anim_group.addAnimation(self.animation_2)
+            self.anim_group.start()
+        elif cmd == 'pull':
+            self.animation_1 = QPropertyAnimation(frame_obj, b'size')
+            self.myTimer = QtCore.QTimer(self)
+            self.animation_1.setStartValue(QSize(round(frame_obj.width() / 3), round(frame_obj.height() / 3)))
+            self.animation_1.setEndValue(QSize(round(frame_obj.width()), round(frame_obj.height())))
+            self.animation_1.setDuration(9500)
+            self.animation_2 = QPropertyAnimation(frame_obj, b'size')
+            self.animation_2.setEndValue(QSize(round(frame_obj.width()), round(frame_obj.height())))
+            self.animation_2.setDuration(500)
+            self.anim_group = QSequentialAnimationGroup()
+            self.anim_group.addAnimation(self.animation_1)
+            self.anim_group.addAnimation(self.animation_2)
+            self.anim_group.start()
+        elif cmd == 'drop':
+            self.animation_1 = QPropertyAnimation(frame_obj, b'pos')
+            self.myTimer = QtCore.QTimer(self)
+            self.animation_1.setStartValue(QPoint(frame_obj.x(), frame_obj.y()))
+            self.animation_1.setEndValue(QPoint(round(frame_obj.x()), round(frame_obj.y() * 2)))
+            self.animation_1.setDuration(9500)
+            self.animation_2 = QPropertyAnimation(frame_obj, b'pos')
+            self.animation_2.setEndValue(QPoint(round(frame_obj.x()), round(frame_obj.y())))
+            self.animation_2.setDuration(500)
+            self.anim_group = QSequentialAnimationGroup()
+            self.anim_group.addAnimation(self.animation_1)
+            self.anim_group.addAnimation(self.animation_2)
+            self.anim_group.start()
+        elif cmd == 'lift':
+            self.animation_1 = QPropertyAnimation(frame_obj, b'pos')
+            self.myTimer = QtCore.QTimer(self)
+            self.animation_1.setStartValue(QPoint(frame_obj.x(), frame_obj.y()))
+            self.animation_1.setEndValue(QPoint(round(frame_obj.x()), round(frame_obj.y() / 3)))
+            self.animation_1.setDuration(9500)
+            self.animation_2 = QPropertyAnimation(frame_obj, b'pos')
+            self.animation_2.setEndValue(QPoint(round(frame_obj.x()), round(frame_obj.y())))
+            self.animation_2.setDuration(500)
+            self.anim_group = QSequentialAnimationGroup()
+            self.anim_group.addAnimation(self.animation_1)
+            self.anim_group.addAnimation(self.animation_2)
+            self.anim_group.start()
+        elif cmd == 'neutral':
+            print('neutral training')
+
+    def get_user_prof(self):
+        with open("user.json", "r") as user_file:
+            user_info = json.load(user_file)
+        user = {
+            "license": user_info["license"],
+            "client_id": user_info["client_id"],
+            "client_secret": user_info["client_secret"],
+            "debit": user_info["debit"]
+        }
+        return user
+
+    def CreateProfile(self):
+        self.NeutTrn.setDisabled(False)
+        self.PushTrn.setDisabled(False)
+        self.PullTrn.setDisabled(False)
+        self.LiftTrn.setDisabled(False)
+        self.DropTrn.setDisabled(False)
+        temp = create_profile(self.get_user_prof(), self.ProfileLine.text())
+        if temp:
+            for entry in temp:
+                if entry['action'] == 'neutral':
+                    self.NeutralLabel.setText(str(entry['times']))
+                    self.NeutralLabelCounter += entry['times']
+                elif entry['action'] == 'push':
+                    self.PushLabel.setText(str(entry['times']))
+                    self.PushLabelCounter += entry['times']
+                elif entry['action'] == 'pull':
+                    self.PullLabel.setText(str(entry['times']))
+                    self.PullLabelCounter += entry['times']
+                elif entry['action'] == 'Lift':
+                    self.LiftLabel.setText(str(entry['times']))
+                    self.LiftLabelCounter += entry['times']
+                elif entry['action'] == 'Drop':
+                    self.DropLabel.setText(str(entry['times']))
+                    self.DropLabelCounter += entry['times']
+        self.profile_name = (self.ProfileLine.text())
+        self.CrtProfile.setDisabled(True)
+
+
+    def plot_brain_map(self):
+        map_data = brain_map(self.get_user_prof(),self.profile_name)
+        if map_data:
+            print('hi')
+            self.plot()
+
+    def plot(self):
+
+
+
+    def update_counter_label(self, cmd):
+        if cmd == 'neutral':
+            self.NeutralLabelCounter += 1
+            self.NeutralLabel.setText(str(self.NeutralLabelCounter))
+        elif cmd == 'push':
+            self.PushLabelCounter += 1
+            self.PushLabel.setText(str(self.PushLabelCounter))
+        elif cmd == 'pull':
+            self.PullLabelCounter += 1
+            self.PullLabel.setText(str(self.PullLabelCounter))
+        elif cmd == 'lift':
+            self.LiftLabelCounter += 1
+            self.LiftLabel.setText(str(self.LiftLabelCounter))
+        elif cmd == 'Drop':
+            self.DropLabelCounter += 1
+            self.DropLabel.setText(str(self.DropLabelCounter))
 
     def update_borders(self, tab):
         self.keyboard.setStyleSheet(
@@ -408,7 +597,6 @@ class WelcomeScreen(QDialog):
         spotify_client_secret = spot_config['client_secret']
         spotify_redirect_url = spot_config['redirect_uri']
 
-
         # set initial values for the UI
         self.emotivThrshldSlider.setValue(int(activation_threshold))
         self.emotivDlySpinBox.setValue(int(activation_delay))
@@ -503,7 +691,6 @@ class WelcomeScreen(QDialog):
             dev2_act = "Device 2: " + config["dev2_act"]
         else:
             dev2_act = ""
-
         if config["spot_play"] != "-":
             spot_play = config["spot_play"]
         else:
@@ -524,12 +711,11 @@ class WelcomeScreen(QDialog):
         else:
             spot_prev = "-"
 
-
-
         self.keyStatLabel.setText(f"Current key mapping:     {key_push}      {key_pull}      "
                                   f"{key_lift}       {key_left}      {key_right}")
         self.smartStatLabel.setText(f"Device activations:    {dev1_act}      {dev2_act}")
-        self.spotifyStatLabel.setText(f"Play:{spot_play}    Pause:{spot_pause}     Next:{spot_next}      Previous:{spot_prev}")
+        self.spotifyStatLabel.setText(
+            f"Play:{spot_play}    Pause:{spot_pause}     Next:{spot_next}      Previous:{spot_prev}")
         update_vals = config
         self.update_ui_parameters()
 
@@ -554,6 +740,7 @@ class WelcomeScreen(QDialog):
             self.spotifyHeadLabel.setStyleSheet("color:red;")
 
     def set_arduino_status(self):
+
         arduino_Stat = check_arduino_connection
         if arduino_Stat:
             self.fesStatLabel.setText("Hub box is connected!")
@@ -563,6 +750,7 @@ class WelcomeScreen(QDialog):
             self.WCStatLabel.setText("Hub box is NOT connected!")
 
     def update_ui(self, update_vals):
+
         [progress_val, progress_label, keys, devs, headset, arduino_con, spotify_labels] = update_vals
         self.keyLabel.setText(progress_label)
         self.keyProgressBar.setValue(progress_val)
@@ -637,7 +825,7 @@ class WelcomeScreen(QDialog):
 """
  headset_thread: a thread that generates an object from the Emotiv cortex  class and 
  runs the sub_request_GRH function in an infinite while loop. this function constantly 
- reads data generated by the headset and maps it to keyboard key presses, FES, or smartplug outputs. 
+ reads data generated by the heads1111et and maps it to keyboard key presses, FES, or smartplug outputs. 
 """
 
 
@@ -655,7 +843,8 @@ def headset_thread(env, ArduinoSerial):
     device_act = [config["dev1_act"], config["dev2_act"]]
     device_duration = config["smart_on_period"]
     btn_action = [config["btn_1"], config["btn_2"], config["btn_3"], config["btn_4"]]
-    spotify_cmd = [config["spot_play"], config["spot_pause"], config["spot_next"], config["spot_prev"], config['spot_min_dly']]
+    spotify_cmd = [config["spot_play"], config["spot_pause"], config["spot_next"], config["spot_prev"],
+                   config['spot_min_dly']]
     with open("user.json", "r") as user_file:
         user_info = json.load(user_file)
     user = {
@@ -666,7 +855,7 @@ def headset_thread(env, ArduinoSerial):
     }
     try:
         c = Cortex(user, debug_mode=False)
-        t = train.Train()
+        t = train.Train(user)
         c.bind(new_com_data=t.on_new_data)
         c.do_prepare_steps()
         c.sub_request(['sys'])

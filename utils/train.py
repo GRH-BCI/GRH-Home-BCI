@@ -27,7 +27,7 @@ class Train():
         To handle mental command data emitted from Cortex
     """
 
-    def __init__(self):
+    def __init__(self,user):
         """
         Constructs cortex client and bind a function to handle subscribed data streams for the Train object
         If you do not want to log request and response message , set debug_mode = False. The default is True
@@ -152,9 +152,6 @@ class Train():
         status = "save"
         self.c.setup_profile(profile_name, status)
 
-
-
-
     def live(self, profile_name, threshold, delay, key):
         """
         Load a trained profiles then subscribe mental command data to enter live mode
@@ -168,10 +165,20 @@ class Train():
         status = 'load'
         # self.c.setup_profile(profile_name, status)
 
+
         # sub 'com' stream and view live mode
         stream = ['com']
 
         self.c.sub_request_GRH(stream, threshold, delay, key)
+
+    def get_trained_data(self, profile_name):
+        temp = self.c.get_training_data(profile_name)
+        return temp['result']['trainedActions']
+
+    def get_brain_map_data(self, profile_name):
+        brainMap = self.c.brain_map(profile_name)
+        return brainMap
+
     def on_new_data(self, *args, **kwargs):
         """
         To handle mental command data emitted from Cortex
@@ -187,15 +194,17 @@ class Train():
 
 # -----------------------------------------------------------
 
+
+
 '''
 SETTING
     - replace your license, client_id, client_secret to user dic
     - naming your profile
     - connect your headset with dongle or bluetooth, you should saw headset on EmotivApp.
       make sure the headset at good contact quality.
-
+    
 TRAIN
-    you need to folow steps:
+    you need to follow steps:
         1) do_prepare_steps: for authorization, connect headset and create working session.
         2) subscribe 'sys' data for Training Event
         3) load a profile with the connected headset
@@ -216,18 +225,36 @@ LIVE
     To get a client id and a client secret, you must connect to your Emotiv account on emotiv.com and create a Cortex app
     For training purpose, you should set empty string for license
 """
-user = {
-    "license" : "",
-    "client_id" : "your client id",
-    "client_secret" : "your client secret",
-    "debit" : 100
-}
+import threading
+def train_MC_thread(user,profile,mc):
+    t = Train(user)
+    t.do_prepare_steps()
+    t.subscribe_data(['sys'])
+    t.load_profile(profile)
+    t.train_mc(profile, mc, 1)
+    t.unload_profile(profile)
 
-# name of training profile
-profile_name = 'TEST'
+def create_profile(user,ProfileName):
+    t = Train(user)
+    t.do_prepare_steps()
+    t.subscribe_data(['sys'])
+    t.load_profile(ProfileName)
+    if t.get_trained_data(ProfileName):
+        t.unload_profile(ProfileName)
+        return t.get_trained_data(ProfileName)
+    t.unload_profile(ProfileName)
 
-# number of training time for one action
-number_of_train = 1
 
-# Init Train
-t=Train()
+def train_MC(user,profile,mc):
+    thread = threading.Thread(target=train_MC_thread, args=(user,profile,mc))
+    thread.start()
+
+
+def brain_map(user, profile_name):
+    t = Train(user)
+    t.do_prepare_steps()
+    t.subscribe_data(['sys'])
+    t.load_profile(profile_name)
+    map_data = t.get_brain_map_data(profile_name)
+    print(map_data['result'])
+    return map_data['result']
