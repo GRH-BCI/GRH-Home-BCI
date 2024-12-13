@@ -1,6 +1,7 @@
 from utils.cortex import Cortex
+from PyQt5.QtCore import pyqtSignal, QObject
 
-class Train():
+class Train(QObject):
     """
     A class to use BCI API to control the training of the mental command detections.
 
@@ -27,13 +28,19 @@ class Train():
         To handle mental command data emitted from Cortex
     """
 
-    def __init__(self):
+    accept_signal = pyqtSignal(str, str)
+    reject_signal = pyqtSignal(str, str)
+    delete_signal = pyqtSignal(str, str)
+
+    def __init__(self,user):
         """
         Constructs cortex client and bind a function to handle subscribed data streams for the Train object
         If you do not want to log request and response message , set debug_mode = False. The default is True
         """
         self.c = Cortex(user, debug_mode=False)
         self.c.bind(new_com_data=self.on_new_data)
+        super().__init__()
+
 
     def do_prepare_steps(self):
         """
@@ -110,50 +117,41 @@ class Train():
         else:
             print("The profile " + profile_name + " is not existed.")
 
-    def train_mc(self, profile_name, training_action, number_of_train):
-        """
-        To control the training of the mental command action.
-        Make sure the headset is at good contact quality. You need to focus during 8 seconds for training an action.
-        For simplicity, the training will be called to accepted automatically and then the training will be saved.
-
-        Parameters
-        ----------
-        profile_name : string, required
-            name of training profile
-        training_action : string, required
-            mental command action, for example: neutral, push, pull, lift...
-        number_of_train : int, required
-            number of training for the action
-        Returns
-        -------
-        None
-        """
-
+    def train_mc(self, training_action):
         print('begin train -----------------------------------')
-        num_train = 0
-        while num_train < number_of_train:
-            num_train = num_train + 1
+        status = 'start'
+        train_thread = threading.Thread(target=self.c.train_request, args=('mentalCommand',training_action,status))
+        train_thread.start()
+        # self.c.train_request(detection='mentalCommand',
+        #                      action=training_action,
+        #                      status=status)
 
-            print('start training {0} time {1} ---------------'.format(training_action, num_train))
-            print('\n')
-            status='start'          
-            self.c.train_request(detection='mentalCommand',
-                                action=training_action,
-                                status=status)
-
-            print('accept {0} time {1} ---------------'.format(training_action, num_train))
-            print('\n')
-            status='accept'
-            self.c.train_request(detection='mentalCommand',
-                                action=training_action, 
-                                status=status)
-        
-        print('save trained action')
+    def accept_training(self, profile_name, training_action):
+        status = 'accept'
+        self.c.train_request(detection='mentalCommand',
+                             action=training_action,
+                             status=status)
         status = "save"
         self.c.setup_profile(profile_name, status)
+        print('save successful')
 
+    def delete_training(self, profile_name, training_action):
+        status = 'erase'
+        self.c.train_request(detection='mentalCommand',
+                             action=training_action,
+                             status=status)
+        status = "save"
+        self.c.setup_profile(profile_name, status)
+        print('save successful')
 
-
+    def reject_training(self, profile_name, training_action):
+        status = 'reject'
+        self.c.train_request(detection='mentalCommand',
+                             action=training_action,
+                             status=status)
+        status = "save"
+        self.c.setup_profile(profile_name, status)
+        print('save successful')
 
     def live(self, profile_name, threshold, delay, key):
         """
@@ -168,10 +166,20 @@ class Train():
         status = 'load'
         # self.c.setup_profile(profile_name, status)
 
+
         # sub 'com' stream and view live mode
         stream = ['com']
 
         self.c.sub_request_GRH(stream, threshold, delay, key)
+
+    def get_trained_data(self, profile_name):
+        temp = self.c.get_training_data(profile_name)
+        return temp['result']['trainedActions']
+
+    def get_brain_map_data(self, profile_name):
+        brainMap = self.c.brain_map(profile_name)
+        return brainMap
+
     def on_new_data(self, *args, **kwargs):
         """
         To handle mental command data emitted from Cortex
@@ -187,47 +195,47 @@ class Train():
 
 # -----------------------------------------------------------
 
-'''
-SETTING
-    - replace your license, client_id, client_secret to user dic
-    - naming your profile
-    - connect your headset with dongle or bluetooth, you should saw headset on EmotivApp.
-      make sure the headset at good contact quality.
 
-TRAIN
-    you need to folow steps:
-        1) do_prepare_steps: for authorization, connect headset and create working session.
-        2) subscribe 'sys' data for Training Event
-        3) load a profile with the connected headset
-        4) do training actions one by one. Begin with neutral action
 
-LIVE
-    you can run live mode with the trained profile. the data as below:
 
-    {'action': 'neutral', 'power': 0.0, 'time': 1590736942.8479}
-    {'action': 'neutral', 'power': 0.0, 'time': 1590736942.9729}
-    {'action': 'push', 'power': 0.345774, 'time': 1590736943.0979}
-    {'action': 'push', 'power': 0.294056, 'time': 1590736943.2229}
-    {'action': 'push', 'power': 0.112473, 'time': 1590736943.3479}
-'''
+import threading
+def train_MC_thread(user,profile,mc):
+    t = Train(user)
+    t.do_prepare_steps()
+    t.subscribe_data(['sys'])
+    t.load_profile(profile)
+    t.train_mc(profile, mc)
+    t.unload_profile(profile)
 
-"""
-    client_id, client_secret:
-    To get a client id and a client secret, you must connect to your Emotiv account on emotiv.com and create a Cortex app
-    For training purpose, you should set empty string for license
-"""
-user = {
-    "license" : "",
-    "client_id" : "your client id",
-    "client_secret" : "your client secret",
-    "debit" : 100
-}
+def create_profile(user,ProfileName):
+    t = Train(user)
+    t.do_prepare_steps()
+    t.subscribe_data(['sys'])
+    t.load_profile(ProfileName)
+    if t.get_trained_data(ProfileName):
+        t.unload_profile(ProfileName)
+        return t.get_trained_data(ProfileName)
+    t.unload_profile(ProfileName)
 
-# name of training profile
-profile_name = 'TEST'
 
-# number of training time for one action
-number_of_train = 1
+def train_MC(user,profile,mc):
+    # thread = threading.Thread(target=train_MC_thread, args=(user,profile,mc))
+    # thread.start()
+    t = Train(user)
+    t.do_prepare_steps()
+    t.subscribe_data(['sys'])
+    t.load_profile(profile)
+    t.train_mc(profile, mc)
+    # t.unload_profile(profile)
 
-# Init Train
-t=Train()
+
+
+def brain_map(user, profile_name):
+    t = Train(user)
+    t.do_prepare_steps()
+    t.subscribe_data(['sys'])
+    t.load_profile(profile_name)
+    map_data = t.get_brain_map_data(profile_name)
+    print(map_data['result'])
+    return map_data['result']
+

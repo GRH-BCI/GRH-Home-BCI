@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/delete.svg</file>
+    <file>icons/wheelchair.svg</file>
     <file>icons/activity.svg</file>
     <file>icons/archive.svg</file>
     <file>icons/book-open.svg</file>
@@ -7,18 +9,24 @@
     <file>icons/headphones.svg</file>
     <file>icons/help-circle.svg</file>
     <file>icons/menu.svg</file>
+    <file>icons/next.svg</file>
     <file>icons/pause.svg</file>
+    <file>icons/play.svg</file>
     <file>icons/power.svg</file>
+    <file>icons/previous.svg</file>
     <file>icons/printer.svg</file>
     <file>icons/settings.svg</file>
     <file>icons/smartphone.svg</file>
+    <file>icons/spotify.svg</file>
     <file>icons/type.svg</file>
+    <file>icons/train.svg</file>
     <file>icons/zap.svg</file>
     <file>icons/zap-off.svg</file>
   </qresource>
   <qresource prefix="photos">
-    <file>logo.png</file>
+    <file>Assets/frog.png</file>
     <file>Assets/gaming.JPG</file>
+    <file>Assets/logo.png</file>
     <file>Assets/paint.jpg</file>
   </qresource>
 </RCC>

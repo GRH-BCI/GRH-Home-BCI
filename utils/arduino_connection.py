@@ -24,6 +24,7 @@ def find_arduino_port():
             with open("config.json", "r") as config_file:
                 config = json.load(config_file)
             config["fes_port"] = myports[myports_desc.index(port_desc)][0]
+            print(myports[myports_desc.index(port_desc)][0])
             json.dump(config, open("config.json", "w"), indent=4, sort_keys=False)
 
 
