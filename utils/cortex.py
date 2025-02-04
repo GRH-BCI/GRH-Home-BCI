@@ -7,7 +7,10 @@ from pydispatch.dispatch import Dispatcher
 from utils.press import press
 from pynput.keyboard import Key, Controller
 from utils.handle_dev import handle_device
+from utils.spotify import spotify_handler
+from utils.blth_handler import send_data, connect_to_blth, find_blth_ports
 import asyncio
+import queue
 from pynput.mouse import Controller as mouse_controller
 from pynput.mouse import Button as mouse_Button
 from utils.mouse_click import mouse_click
@@ -39,6 +42,7 @@ MENTAL_COMMAND_ACTIVE_ACTION_ID = 16
 MENTAL_COMMAND_BRAIN_MAP_ID = 17
 MENTAL_COMMAND_TRAINING_THRESHOLD = 18
 SET_MENTAL_COMMAND_ACTIVE_ACTION_ID = 19
+GET_TRAINING_DATA = 20
 
 class Cortex(Dispatcher):
     def __init__(self, user, debug_mode=False):
@@ -356,7 +360,9 @@ class Cortex(Dispatcher):
             else:
                 print(new_data)
 
-    def sub_request_GRH(self, stream, threshold, delay, key, arduino_serial, triggers, min_dly, flag, env, prev_state,device_ip,device_act, device_duration, prev_wc_btn, btn_action):
+    def sub_request_GRH(self, stream, threshold, delay, key, AT_sock, triggers, min_dly, flag, env, prev_state,
+                        device_ip,device_act, device_duration, prev_wc_btn, btn_action, spotify_cmd, prev_time, latch_flags):
+
         print('subscribe request --------------------------------')
         sub_request_json = {
             "jsonrpc": "2.0",
@@ -386,8 +392,9 @@ class Cortex(Dispatcher):
             print("subscribe get error: " + result_dic['error']['message'])
             return
         else:
-            # handle data lable
+            # handle data label
             try:
+                # print(result_dic['result'])
                 for stream in result_dic['result']['success']:
                     stream_name = stream['streamName']
                     stream_labels = stream['cols']
@@ -395,13 +402,13 @@ class Cortex(Dispatcher):
                     if stream_name != 'com' and stream_name != 'fac':
                         self.extract_data_labels(stream_name, stream_labels)
             except:
-                print('data input error----------------------------------------------------------------')
+                print('data input error55----------------------------------------------------------------')
+
 
         # Handle data event
-        with open("time_config.json", "r") as config_file:
-            config = json.load(config_file)
-        temp_time = config["time"]
 
+        temp_time = prev_time
+        data = ["-", 0]
         # while True:
         new_data = self.ws.recv()
         # Then emit the change with optional positional and keyword arguments
@@ -411,6 +418,7 @@ class Cortex(Dispatcher):
             com_data['action'] = result_dic['com'][0]
             com_data['power'] = result_dic['com'][1]
             com_data['time'] = result_dic['time']
+            data = [com_data['action'], com_data['power']]
             threshold = threshold
             self.emit('new_com_data', data=com_data)
             on_command = str(triggers[0])
@@ -419,9 +427,14 @@ class Cortex(Dispatcher):
             btn2_action = str(btn_action[1])
             btn3_action = str(btn_action[2])
             btn4_action = str(btn_action[3])
+            spotify_play_cmd = str(spotify_cmd[0])
+            spotify_pause_cmd = str(spotify_cmd[1])
+            spotify_next_cmd = str(spotify_cmd[2])
+            spotify_prev_cmd = str(spotify_cmd[3])
+            spotify_min_dly = spotify_cmd[4]
 
             if com_data['action'] == 'push' and 100 * float(com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= delay and flag != 'stop' and env == "keyboard":
+                    float(time.time()) - temp_time) >= delay and flag != 'stop' and env == "keyboard":
                 if key[0] == '':
                     print("please assign a corresponding keyboard key to this command")
                 elif key[0] == 'space':
@@ -440,11 +453,10 @@ class Cortex(Dispatcher):
                     press(Key.left)
                 else:
                     press((key[0]))
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+                prev_time = float(time.time())
 
             elif com_data['action'] == 'pull' and 100 * float(com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= delay and flag != 'stop'and env == "keyboard":
+                    float(time.time()) - temp_time) >= delay and flag != 'stop'and env == "keyboard":
                 if key[1] == '':
                     print("please assign a corresponding keyboard key to this command")
                 elif key[1] == 'space':
@@ -463,12 +475,11 @@ class Cortex(Dispatcher):
                     press(Key.left)
                 else:
                     press((key[1]))
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+                prev_time = float(time.time())
 
 
             elif com_data['action'] == 'lift' and 100 * float(com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= delay and flag != 'stop'and env == "keyboard":
+                    float(time.time()) - temp_time) >= delay and flag != 'stop'and env == "keyboard":
                 if key[2] == '':
                     print("please assign a corresponding keyboard key to this command")
                 elif key[2] == 'space':
@@ -487,129 +498,186 @@ class Cortex(Dispatcher):
                     press(Key.left)
                 else:
                     press((key[2]))
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+                prev_time = float(time.time())
+
             elif com_data['action'] == 'left' and 100 * float(com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= delay and flag != 'stop'and env == "keyboard":
-                if key[4] == '':
+                    float(time.time()) - temp_time) >= delay and flag != 'stop'and env == "keyboard":
+                if key[3] == '':
                     print("please assign a corresponding keyboard key to this command")
-                elif key[4] == 'space':
+                elif key[3] == 'space':
                     press(Key.space)
-                elif key[4] == 'enter':
+                elif key[3] == 'enter':
                     press(Key.enter)
-                elif key[4] == 'Lclick':
+                elif key[3] == 'Lclick':
                     mouse_click(mouse_Button.left)
-                elif key[4] == 'up':
+                elif key[3] == 'up':
                     press(Key.up)
-                elif key[4] == 'down':
+                elif key[3] == 'down':
                     press(Key.down)
-                elif key[4] == 'right':
+                elif key[3] == 'right':
                     press(Key.right)
-                elif key[4] == 'left':
+                elif key[3] == 'left':
                     press(Key.left)
                 else:
-                    press((key[4]))
+                    press((key[3]))
+                prev_time = float(time.time())
 
-            elif com_data['action'] == 'right' and 100 * float(com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= delay and flag != 'stop'and env == "keyboard":
-                if key[5] == '':
-                    print("please assign a corresponding keyboard key to this command")
-                elif key[5] == 'space':
-                    press(Key.space)
-                elif key[5] == 'enter':
-                    press(Key.enter)
-                elif key[5] == 'Lclick':
-                    mouse_click(mouse_Button.left)
-                elif key[5] == 'up':
-                    press(Key.up)
-                elif key[5] == 'down':
-                    press(Key.down)
-                elif key[5] == 'right':
-                    press(Key.right)
-                elif key[5] == 'left':
-                    press(Key.left)
-                else:
-                    press((key[5]))
-
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
-
-            elif com_data['action'] == 'neurtal' and env=="keyboard":
+            elif com_data['action'] == 'neurtal' and env == "keyboard":
                 print('neutral')
+
             elif com_data['action'] == on_command and 100 * float(com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= min_dly and env == "fes":
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('N'))
+                    float(time.time()) - temp_time) >= min_dly and env == "fes":
+                send_data(AT_sock, "0N")
                 time.sleep(.1)
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('F'))
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+                send_data(AT_sock, "0F")
+                prev_time = float(time.time())
                 prev_state = 'on'
                 activation = (time.time())
 
             elif com_data['action'] == off_command and com_data['action'] != 'neutral' and 100 * float(
                     com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= min_dly and prev_state == 'on' and env == "fes":
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('2'))
+                    float(time.time()) - temp_time) >= min_dly and prev_state == 'on' and env == "fes":
+                send_data(AT_sock, "02")
                 time.sleep(.1)
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('F'))
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+                send_data(AT_sock, "0F")
+                prev_time = float(time.time())
                 prev_state = 'off'
+
             elif com_data['action'] == off_command and com_data['action'] == 'neutral' and (
-                    float(com_data['time']) - temp_time) >= min_dly and prev_state == 'on' and env == "fes":
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('2'))
+                    float(time.time()) - temp_time) >= min_dly and prev_state == 'on' and env == "fes":
+                send_data(AT_sock, "02")
                 time.sleep(.1)
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('F'))
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+                send_data(AT_sock, "0F")
+                prev_time = float(time.time())
                 prev_state = 'off'
+
+            elif com_data['action'] == spotify_play_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(time.time()) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("play")
+                prev_time = float(time.time())
+
+            elif com_data['action'] == spotify_pause_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(time.time()) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("pause")
+                prev_time = float(time.time())
+
+            elif com_data['action'] == spotify_next_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(time.time()) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("next")
+                prev_time = float(time.time())
+
+            elif com_data['action'] == spotify_prev_cmd and 100 * float(com_data['power']) >= int(threshold) and (
+                    float(time.time()) - temp_time) >= spotify_min_dly and env == "spotify":
+                spotify_handler("previous")
+                prev_time = float(time.time())
+
             elif com_data['action'] == device_act[0] and 100 * float(com_data['power']) >= int(threshold) and (
-                    float(com_data['time']) - temp_time) >= delay and flag != 'stop'and env == "smart-home":
+                    float(time.time()) - temp_time) >= delay and flag != 'stop'and env == "smart-home":
                 asyncio.run(handle_device(device_ip[0], device_duration))
+                prev_time = float(time.time())
 
             elif com_data['action'] == device_act[1] and 100 * float(com_data['power']) >= int(threshold) and (
-                        float(com_data['time']) - temp_time) >= delay and flag != 'stop' and env == "smart-home":
+                        float(time.time()) - temp_time) >= delay and flag != 'stop' and env == "smart-home":
                 asyncio.run(handle_device(device_ip[1], device_duration))
+                prev_time = float(time.time())
 
-            elif com_data['action'] == btn1_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn1' and flag != 'stop'and env == "wc":
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('N'))
-                # time.sleep(.1)
-                prev_wc_btn = 'btn1'
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
-            elif com_data['action'] == btn2_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn2' and flag != 'stop'and env == "wc":
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('2'))
-                # time.sleep(.1)
-                prev_wc_btn = 'btn2'
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
-            elif com_data['action'] == btn3_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn3' and flag != 'stop'and env == "wc":
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('3'))
-                # time.sleep(.1)
-                prev_wc_btn = 'btn3'
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
-            elif com_data['action'] == btn4_action and 100 * float(com_data['power']) >= int(threshold) and prev_wc_btn != 'btn4' and flag != 'stop'and env == "wc":
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('4'))
-                # time.sleep(.1)
-                prev_wc_btn = 'btn4'
-                config["time"] = float(com_data['time'])
-                json.dump(config, open("time_config.json", "w"), indent=4, sort_keys=True)
+            elif com_data['action'] == btn1_action and 100 * float(com_data['power']) >= int(threshold) and (
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn1' and flag != 'stop'and env == "wc":
+
+                if prev_wc_btn == 'btn1_latched':
+                    time.sleep(.06)
+                    send_data(AT_sock, "0F")
+                    prev_wc_btn = 'off'
+                    prev_time = float(time.time())
+
+                else:
+                    send_data(AT_sock, "0N")
+                    # time.sleep(.1)
+                    prev_wc_btn = 'btn1'
+                    prev_time = float(time.time())
+
+            elif com_data['action'] == btn2_action and 100 * float(com_data['power']) >= int(threshold) and (
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn2' and flag != 'stop'and env == "wc":
+                if prev_wc_btn == 'btn2_latched':
+                    time.sleep(.06)
+                    send_data(AT_sock, "0F")
+                    prev_wc_btn = 'off'
+                    prev_time = float(time.time())
+
+                else:
+                    send_data(AT_sock, "02")
+                    # time.sleep(.1)
+                    prev_wc_btn = 'btn2'
+                    prev_time = float(time.time())
+
+            elif com_data['action'] == btn3_action and 100 * float(com_data['power']) >= int(threshold) and (
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn3' and flag != 'stop'and env == "wc":
+                if prev_wc_btn == 'btn3_latched':
+                    time.sleep(.06)
+                    send_data(AT_sock, "0F")
+                    prev_wc_btn = 'off'
+                    prev_time = float(time.time())
+
+                else:
+                    send_data(AT_sock, "03")
+                    # time.sleep(.1)
+                    prev_wc_btn = 'btn3'
+                    prev_time = float(time.time())
+
+            elif com_data['action'] == btn4_action and 100 * float(com_data['power']) >= int(threshold) and (
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn4' and flag != 'stop'and env == "wc":
+                if prev_wc_btn == 'btn4_latched':
+                    time.sleep(.06)
+                    send_data(AT_sock, "0F")
+                    prev_wc_btn = 'off'
+                    prev_time = float(time.time())
+
+                else:
+                    send_data(AT_sock, "04")
+                    # time.sleep(.1)
+                    prev_wc_btn = 'btn4'
+                    prev_time = float(time.time())
+
             elif flag != 'stop'and env == "wc" and com_data['action'] == 'neutral':
+                if prev_wc_btn == 'btn1':
+                    if latch_flags[0]:
+                        print('latched')
+                        prev_wc_btn = 'btn1_latched'
+                    else:
+                        time.sleep(.06)
+                        send_data(AT_sock, "0F")
+                        prev_wc_btn = 'off'
+                elif prev_wc_btn == 'btn2':
+                    if latch_flags[1]:
+                        print('latched')
+                        prev_wc_btn = 'btn2_latched'
+                    else:
+                        time.sleep(.06)
+                        send_data(AT_sock, "0F")
+                        prev_wc_btn = 'off'
+                elif prev_wc_btn == 'btn3':
+                    if latch_flags[2]:
+                        print('latched')
+                        prev_wc_btn = 'btn3_latched'
+                    else:
+                        time.sleep(.06)
+                        send_data(AT_sock, "0F")
+                        prev_wc_btn = 'off'
+                elif prev_wc_btn == 'btn4':
+                    if latch_flags[3]:
+                        print('latched')
+                        prev_wc_btn = 'btn4_latched'
+                    else:
+                        time.sleep(.06)
+                        send_data(AT_sock, "0F")
+                        prev_wc_btn = 'off'
+
+            elif flag == 'stop' and env == "wc":
+
                 time.sleep(.06)
-                arduino_serial.write(str.encode('0'))
-                arduino_serial.write(str.encode('F'))
+                send_data(AT_sock, "0F")
                 prev_wc_btn = 'off'
+
             else:
                 print('Waiting for new command')
 
@@ -655,7 +723,8 @@ class Cortex(Dispatcher):
             self.emit('new_pow_data', data=pow_data)
         else:
             print(new_data)
-        return prev_state, activation, prev_wc_btn
+
+        return prev_state, activation, prev_wc_btn, data, prev_time
 
     def extract_data_labels(self, stream_name, stream_cols):
         data = {}
@@ -734,7 +803,7 @@ class Cortex(Dispatcher):
             print('result \n', json.dumps(result_dic, indent=4))
             print('\n')
 
-    def train_request(self, detection, action, status):
+    def train_request(self, detection, action, status, q):
         # print('train request --------------------------------')
         train_request_json = {
             "jsonrpc": "2.0",
@@ -757,7 +826,8 @@ class Cortex(Dispatcher):
         if detection == 'mentalCommand':
             start_wanted_result = 'MC_Succeeded'
             accept_wanted_result = 'MC_Completed'
-
+            reject_wanted_result = 'MC_Rejected'
+            erase_wanted_result = 'MC_DataErased'
         if detection == 'facialExpression':
             start_wanted_result = 'FE_Succeeded'
             accept_wanted_result = 'FE_Completed'
@@ -769,17 +839,64 @@ class Cortex(Dispatcher):
         if status == 'accept':
             wanted_result = accept_wanted_result
 
+        if status == 'reject':
+            wanted_result = reject_wanted_result
+
+        if status == 'erase':
+            wanted_result = erase_wanted_result
+
+
         # wait until success
         while True:
             result = self.ws.recv()
+
             result_dic = json.loads(result)
 
             print(json.dumps(result_dic, indent=4))
 
             if 'sys' in result_dic:
                 # success or complete, break the wait
-                if result_dic['sys'][1] == wanted_result:
+
+                if result_dic['sys'][1] == 'MC_Failed':
+                    q.put(result_dic['sys'][1])
                     break
+                if result_dic['sys'][1] == wanted_result:
+                    q.put(result_dic['sys'][1])
+                    break
+
+    def get_training_data(self, profile_name):
+        print('getting profiles trained data --------------- ')
+        get_training_json = {
+            "jsonrpc": "2.0",
+            "method": "getTrainedSignatureActions",
+            "params": {
+                "cortexToken": self.auth,
+                "detection": "mentalCommand",
+                "profile": profile_name
+            },
+            "id": GET_TRAINING_DATA
+        }
+        self.ws.send(json.dumps(get_training_json))
+        result = self.ws.recv()
+        result_dic = json.loads(result)
+        return result_dic
+
+    def brain_map(self, profile_name):
+        print('brain map plot --------------- ')
+        brain_map_json = {
+            "jsonrpc": "2.0",
+            "method": "mentalCommandBrainMap",
+            "params": {
+                "cortexToken": self.auth,
+                "profile": profile_name,
+                "session": self.session_id
+            }
+        }
+        self.ws.send(json.dumps(brain_map_json))
+        result = self.ws.recv()
+        result_dic = json.loads(result)
+        return result_dic
+
 
     def create_record(self,
                       record_name,
