@@ -1,7 +1,7 @@
 {
-    "activation_threshold": 60,
+    "activation_threshold": 0,
     "activation_delay": 0,
-    "key_push": "a",
+    "key_push": "w",
     "key_pull": "a",
     "key_lift": "d",
     "key_drop": "s",
@@ -11,6 +11,7 @@
     "dev2_ip": ". . .",
     "fes_on": "push",
     "fes_off": "-",
+    "fes_port": "COM7",
     "fes_acceptable_dly": 9,
     "fes_min_dly": 2,
     "smart_on_period": 5,
@@ -23,5 +24,5 @@
     "spot_next": "-",
     "spot_prev": "-",
     "spot_min_dly": 0,
-    "hub_name": "AT-HUB-6"
+    "hub_name": "ESP32test1"
 }
