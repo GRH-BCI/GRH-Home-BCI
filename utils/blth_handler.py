@@ -54,3 +54,18 @@ def send_data(sock, data):
             print("No valid connection to send data.")
     except Exception as e:
         print(f"Failed to send data: {e}")
+
+
+
+def receive_data(sock): # return the data varailbe
+    try:
+        if sock:
+            data = sock.recv(1024).decode('utf-8')
+            print(f"Received: {data}")
+            return data
+        else:
+            print("No valid connection to receive data.")
+            return None
+    except Exception as e:
+        print(f"Failed to receive data: {e}")
+        return None

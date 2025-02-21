@@ -432,6 +432,10 @@ class Cortex(Dispatcher):
             spotify_next_cmd = str(spotify_cmd[2])
             spotify_prev_cmd = str(spotify_cmd[3])
             spotify_min_dly = spotify_cmd[4]
+            if not latch_flags[4]:
+                BCIonly = True
+            else:
+                BCIonly = False
 
             if com_data['action'] == 'push' and 100 * float(com_data['power']) >= int(threshold) and (
                     float(time.time()) - temp_time) >= delay and flag != 'stop' and env == "keyboard":
@@ -527,9 +531,9 @@ class Cortex(Dispatcher):
 
             elif com_data['action'] == on_command and 100 * float(com_data['power']) >= int(threshold) and (
                     float(time.time()) - temp_time) >= min_dly and env == "fes":
-                send_data(AT_sock, "0N")
+                send_data(AT_sock, "R11")
                 time.sleep(.1)
-                send_data(AT_sock, "0F")
+                send_data(AT_sock, "R10")
                 prev_time = float(time.time())
                 prev_state = 'on'
                 activation = (time.time())
@@ -537,17 +541,17 @@ class Cortex(Dispatcher):
             elif com_data['action'] == off_command and com_data['action'] != 'neutral' and 100 * float(
                     com_data['power']) >= int(threshold) and (
                     float(time.time()) - temp_time) >= min_dly and prev_state == 'on' and env == "fes":
-                send_data(AT_sock, "02")
+                send_data(AT_sock, "R21")
                 time.sleep(.1)
-                send_data(AT_sock, "0F")
+                send_data(AT_sock, "R20")
                 prev_time = float(time.time())
                 prev_state = 'off'
 
             elif com_data['action'] == off_command and com_data['action'] == 'neutral' and (
                     float(time.time()) - temp_time) >= min_dly and prev_state == 'on' and env == "fes":
-                send_data(AT_sock, "02")
+                send_data(AT_sock, "R21")
                 time.sleep(.1)
-                send_data(AT_sock, "0F")
+                send_data(AT_sock, "R20")
                 prev_time = float(time.time())
                 prev_state = 'off'
 
@@ -582,70 +586,71 @@ class Cortex(Dispatcher):
                 prev_time = float(time.time())
 
             elif com_data['action'] == btn1_action and 100 * float(com_data['power']) >= int(threshold) and (
-                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn1' and flag != 'stop'and env == "wc":
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn1' and flag != 'stop'and BCIonly == True and env == "wc":
 
                 if prev_wc_btn == 'btn1_latched':
                     time.sleep(.06)
-                    send_data(AT_sock, "0F")
+                    send_data(AT_sock, "R10")
                     prev_wc_btn = 'off'
                     prev_time = float(time.time())
 
                 else:
-                    send_data(AT_sock, "0N")
+                    send_data(AT_sock, "R11")
                     # time.sleep(.1)
                     prev_wc_btn = 'btn1'
                     prev_time = float(time.time())
 
             elif com_data['action'] == btn2_action and 100 * float(com_data['power']) >= int(threshold) and (
-                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn2' and flag != 'stop'and env == "wc":
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn2' and flag != 'stop' and BCIonly == True and env == "wc":
                 if prev_wc_btn == 'btn2_latched':
                     time.sleep(.06)
-                    send_data(AT_sock, "0F")
+                    send_data(AT_sock, "R20")
                     prev_wc_btn = 'off'
                     prev_time = float(time.time())
 
+
                 else:
-                    send_data(AT_sock, "02")
+                    send_data(AT_sock, "R21")
                     # time.sleep(.1)
                     prev_wc_btn = 'btn2'
                     prev_time = float(time.time())
 
             elif com_data['action'] == btn3_action and 100 * float(com_data['power']) >= int(threshold) and (
-                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn3' and flag != 'stop'and env == "wc":
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn3' and flag != 'stop' and BCIonly == True and env == "wc":
                 if prev_wc_btn == 'btn3_latched':
                     time.sleep(.06)
-                    send_data(AT_sock, "0F")
+                    send_data(AT_sock, "R30")
                     prev_wc_btn = 'off'
                     prev_time = float(time.time())
 
                 else:
-                    send_data(AT_sock, "03")
+                    send_data(AT_sock, "R31")
                     # time.sleep(.1)
                     prev_wc_btn = 'btn3'
                     prev_time = float(time.time())
 
             elif com_data['action'] == btn4_action and 100 * float(com_data['power']) >= int(threshold) and (
-                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn4' and flag != 'stop'and env == "wc":
+                        float(time.time()) - temp_time) >= delay  and prev_wc_btn != 'btn4' and flag != 'stop' and BCIonly == True and env == "wc":
                 if prev_wc_btn == 'btn4_latched':
                     time.sleep(.06)
-                    send_data(AT_sock, "0F")
+                    send_data(AT_sock, "R40")
                     prev_wc_btn = 'off'
                     prev_time = float(time.time())
 
                 else:
-                    send_data(AT_sock, "04")
+                    send_data(AT_sock, "R41")
                     # time.sleep(.1)
                     prev_wc_btn = 'btn4'
                     prev_time = float(time.time())
 
-            elif flag != 'stop'and env == "wc" and com_data['action'] == 'neutral':
+            elif flag != 'stop'and  BCIonly == True and env == "wc" and com_data['action'] == 'neutral':
                 if prev_wc_btn == 'btn1':
                     if latch_flags[0]:
                         print('latched')
                         prev_wc_btn = 'btn1_latched'
                     else:
                         time.sleep(.06)
-                        send_data(AT_sock, "0F")
+                        send_data(AT_sock, "R10")
                         prev_wc_btn = 'off'
                 elif prev_wc_btn == 'btn2':
                     if latch_flags[1]:
@@ -653,7 +658,7 @@ class Cortex(Dispatcher):
                         prev_wc_btn = 'btn2_latched'
                     else:
                         time.sleep(.06)
-                        send_data(AT_sock, "0F")
+                        send_data(AT_sock, "R20")
                         prev_wc_btn = 'off'
                 elif prev_wc_btn == 'btn3':
                     if latch_flags[2]:
@@ -661,7 +666,7 @@ class Cortex(Dispatcher):
                         prev_wc_btn = 'btn3_latched'
                     else:
                         time.sleep(.06)
-                        send_data(AT_sock, "0F")
+                        send_data(AT_sock, "R30")
                         prev_wc_btn = 'off'
                 elif prev_wc_btn == 'btn4':
                     if latch_flags[3]:
@@ -669,13 +674,16 @@ class Cortex(Dispatcher):
                         prev_wc_btn = 'btn4_latched'
                     else:
                         time.sleep(.06)
-                        send_data(AT_sock, "0F")
+                        send_data(AT_sock, "R40")
                         prev_wc_btn = 'off'
 
-            elif flag == 'stop' and env == "wc":
+            elif flag == 'stop' and env == "wc" and BCIonly == True:
 
                 time.sleep(.06)
-                send_data(AT_sock, "0F")
+                send_data(AT_sock, "R10")
+                send_data(AT_sock, "R20")
+                send_data(AT_sock, "R30")
+                send_data(AT_sock, "R40")
                 prev_wc_btn = 'off'
 
             else:

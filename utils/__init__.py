@@ -9,6 +9,7 @@ from .train import brain_map
 from .blth_handler import find_blth_ports
 from .blth_handler import send_data
 from .blth_handler import connect_to_blth
+from .blth_handler import receive_data
 from .headset_connection import check_headset_connection
 from .launch_app import launch_app
 from .fes_manual_control import manual_stop, manual_start
